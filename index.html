@@ -322,7 +322,10 @@ html, body {
         <!-- KPI block — real + objetivo -->
         <div class="c1-kpi">
           <div class="c1-real-label">Ventas reales</div>
-          <div class="c1-real-val" id="prog-real">22.400 €</div>
+          <div style="display:flex;align-items:baseline;gap:10px;">
+            <div class="c1-real-val" id="prog-real">22.400 €</div>
+            <div id="prog-pct-badge" style="font-size:14px;font-weight:600;color:var(--green);letter-spacing:-0.01em;">107%</div>
+          </div>
           <div class="c1-obj-line">
             <span class="c1-obj-label">Objetivo mensual</span>
             <span class="c1-obj-val" id="prog-obj-val">21.000 €</span>
@@ -483,8 +486,8 @@ html, body {
         </div>
 
         <!-- Context — gray shaded -->
-        <div class="hoy-context">
-          Necesitáis vender <strong>al menos <span id="ctx-ritmo">376 €</span> al día los próximos <span id="ctx-dias">10 días</span> para alcanzar el objetivo</strong> y desbloquear el bonus.
+        <div class="hoy-context" id="hoy-context">
+          🎉 <strong>¡Objetivo del mes alcanzado!</strong> Cada venta extra suma — recordad que lleváis comisión del <strong>2%</strong> sobre todo lo que vendáis a partir de ahora. ¡A por más!
         </div>
 
         <!-- Divider before bars -->
@@ -693,14 +696,19 @@ function animateBars(obj, esp, real) {
   const pEsp    = Math.round((esp  / maxVal) * 100);
   const pReal   = Math.min(Math.round((real / maxVal) * 100), 100);
 
-  /* % labels */
+  /* % labels on bars */
   $('bp-obj').textContent  = '100%';
-  $('bp-esp').textContent  = Math.round((esp  / obj) * 100) + '%';
-  $('bp-real').textContent = Math.round((real / obj) * 100) + '%';
+  $('bp-esp').textContent  = obj > 0 ? Math.round((esp  / obj) * 100) + '%' : '—';
+  $('bp-real').textContent = obj > 0 ? Math.round((real / obj) * 100) + '%' : '—';
 
-  /* Number + % turn green when over objective */
-  const realColor = overObj ? 'var(--green)' : 'var(--ink)';
-  $('bv-real').style.color = realColor;
+  /* Big KPI % badge next to number */
+  const pctBig = obj > 0 ? Math.round((real / obj) * 100) : 0;
+  const badge  = $('prog-pct-badge');
+  badge.textContent  = pctBig + '%';
+  badge.style.color  = overObj ? 'var(--green)' : 'var(--muted)';
+
+  /* Number + % on the bar row turn green when over objective */
+  $('bv-real').style.color = overObj ? 'var(--green)' : 'var(--ink)';
   $('bp-real').style.color = overObj ? 'var(--green)' : 'var(--faint)';
 
   /* Progress bar: black → green when over obj */
@@ -905,11 +913,20 @@ async function loadData() {
     const hoyTotal = hoyTot || (hoyK || 0) + (hoyM || 0);
     $('hoy-subtitle').textContent = 'Total ventas · ' + diaNum + ' de ' + MESES[mesIdx];
     $('hoy-total').textContent    = fmt(hoyTotal);
-    $('ctx-ritmo').textContent    = fmt(rD);
-    $('ctx-dias').textContent     = diasRest + (diasRest === 1 ? ' día' : ' días');
     $('hbv-total').textContent    = fmt(hoyTotal);
     $('hbv-kris').textContent     = fmt(hoyK);
     $('hbv-maria').textContent    = fmt(hoyM);
+
+    /* Context message: motivational if objective reached, informational otherwise */
+    const ctx = $('hoy-context');
+    const overObjC4 = real != null && obj != null && real >= obj;
+    if (overObjC4) {
+      ctx.innerHTML = '🎉 <strong>¡Objetivo del mes alcanzado!</strong> Cada venta extra suma — recordad que lleváis comisión del <strong>2%</strong> sobre todo lo que vendáis a partir de ahora. ¡A por más!';
+    } else {
+      $('ctx-ritmo').textContent = fmt(rD);
+      $('ctx-dias').textContent  = diasRest + (diasRest === 1 ? ' día' : ' días');
+      ctx.innerHTML = 'Necesitáis vender <strong>al menos <span id="ctx-ritmo">' + fmt(rD) + '</span> al día los próximos <span id="ctx-dias">' + (diasRest + (diasRest === 1 ? ' día' : ' días')) + '</span> para alcanzar el objetivo</strong> y desbloquear el bonus.';
+    }
 
     animateHoyBars(hoyK || 0, hoyM || 0, hoyTotal || 0);
 
