@@ -644,7 +644,7 @@ function animateBars(obj, esp, real) {
   const pb = $('prog-badge');
   pb.querySelector('.badge-main').textContent = (pctReal >= 100 ? '✓ ' : '+') + pctReal + '% completado';
   pb.querySelector('.badge-sub').textContent  = (vsEsp >= 0 ? '+' : '') + vsEsp + '% vs. ' + pctEspOf + '% planificado hasta hoy';
-  pb.className = 'badge ' + (pctReal >= 100 ? 'badge-ok' : 'badge-ko');
+  pb.className = 'badge ' + (vsEsp >= 0 ? 'badge-ok' : 'badge-ko');
 
   setTimeout(() => {
     $('bf-obj').style.width  = pObj  + '%';
@@ -691,20 +691,42 @@ async function loadData() {
   try {
     const t = await fetchSheet('Dashboard', 'B3:I32');
 
-    const dia = val(t,0,1), mes = val(t,0,2), anio = val(t,0,3);
-    const obj = val(t,2,1), esp = val(t,3,1), real = val(t,4,1);
-    const vKris  = val(t,7,1),  pKris  = val(t,8,1);
-    const vMaria = val(t,9,1),  pMaria = val(t,10,1);
-    const bonusSt= val(t,12,1);
-    const bKris  = val(t,13,1), bMaria = val(t,14,1);
-    const cKris  = val(t,15,1), cMaria = val(t,16,1);
-    const ritmoD = val(t,19,1);
-    const hoyTot = val(t,20,1), hoyK = val(t,21,1), hoyM = val(t,22,1);
-    const bqKris  = val(t,24,1);
-    const bqMaria = val(t,25,1);
-    /* Employee names from I4 (row 1, col 7) and I5 (row 2, col 7) */
-    const nameE1 = (val(t,1,7) || 'Empleada 1').trim();
-    const nameE2 = (val(t,2,7) || 'Empleada 2').trim();
+    /* ── FECHA: C3=texto fecha, D3=día, E3=mes, F3=año ── */
+    const dia  = val(t, 0, 2); // D3
+    const mes  = val(t, 0, 3); // E3
+    const anio = val(t, 0, 4); // F3
+
+    /* ── MENSUAL (filas 5-7, índices 2-4, sin filas vacías entre ellas) ── */
+    const obj  = val(t, 2, 1); // C5
+    const esp  = val(t, 3, 1); // C6
+    const real = val(t, 4, 1); // C7
+
+    /* ── EMPLEADAS (filas 10-13, índices 5-8: filas 8 y 9 vacías → saltadas) ── */
+    const vKris  = val(t, 5, 1); // C10
+    const pKris  = val(t, 6, 1); // C11
+    const vMaria = val(t, 7, 1); // C12
+    const pMaria = val(t, 8, 1); // C13
+
+    /* ── BONUS (filas 15-19, índices 9-13: fila 14 vacía → saltada) ── */
+    const bonusSt = val(t,  9, 1); // C15
+    const bKris   = val(t, 10, 1); // C16
+    const bMaria  = val(t, 11, 1); // C17
+    const cKris   = val(t, 12, 1); // C18
+    const cMaria  = val(t, 13, 1); // C19
+
+    /* ── DIARIO (filas 22-25, índices 15-18: filas 20 y 21 saltadas/header) ── */
+    const ritmoD = val(t, 15, 1); // C22
+    const hoyTot = val(t, 16, 1); // C23
+    const hoyK   = val(t, 17, 1); // C24
+    const hoyM   = val(t, 18, 1); // C25
+
+    /* ── TRIMESTRE (filas 27-28, índices 19-20: fila 26 vacía → saltada) ── */
+    const bqKris  = val(t, 19, 1); // C27
+    const bqMaria = val(t, 20, 1); // C28
+
+    /* ── NOMBRES desde I4 (índice 1, col 7) e I5 (índice 2, col 7) ── */
+    const nameE1 = (val(t, 1, 7) || 'Empleada 1').trim();
+    const nameE2 = (val(t, 2, 7) || 'Empleada 2').trim();
     const firstE1 = nameE1.split(' ')[0];
     const firstE2 = nameE2.split(' ')[0];
     const initialsE1 = nameE1.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
