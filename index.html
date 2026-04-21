@@ -159,13 +159,28 @@ html, body {
 .bar-track.h-lg { height: 10px; }
 .bar-track.h-md { height:  8px; }
 .bar-fill { height: 100%; border-radius: 5px; transition: width 1.3s cubic-bezier(0.4,0,0.2,1); }
-.fill-obj   { background: #1A1A1A; }
-.fill-esp   { background: #A0A0A0; }
-.fill-green { background: #1A8C4E; }
-.fill-red   { background: #C0392B; }
-.bar-track-rel { position: relative; }
-.esp-marker { position: absolute; top: -3px; height: calc(100% + 6px); width: 2px; pointer-events: none; transition: left 1.3s cubic-bezier(0.4,0,0.2,1); }
-.esp-marker-inner { width: 100%; height: 100%; background: repeating-linear-gradient(to bottom, #555 0px, #555 3px, transparent 3px, transparent 7px); border-radius: 1px; }
+.fill-obj       { background: #1A1A1A; }
+.fill-obj-admin { background: var(--gran); }
+.fill-esp       { background: #A0A0A0; }
+.fill-black     { background: #1A1A1A; }
+.fill-green     { background: #1A8C4E; }
+.fill-red       { background: #C0392B; }
+.bar-track-rel  { position: relative; }
+/* Obj superado marker */
+.obj-marker {
+  position: absolute; top: -3px; height: calc(100% + 6px); width: 2px;
+  pointer-events: none; display: none;
+}
+.obj-marker-inner {
+  width: 100%; height: 100%;
+  background: var(--green); border-radius: 1px;
+}
+.obj-marker-label {
+  position: absolute; top: -14px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px; font-weight: 600; color: var(--green);
+  white-space: nowrap; letter-spacing: 0.04em;
+}
 
 /* ══ CARD 2 — DONUT ══ */
 .card-subtitle { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; width: 100%; text-align: left; }
@@ -307,7 +322,7 @@ html, body {
         <!-- KPI block — real + objetivo -->
         <div class="c1-kpi">
           <div class="c1-real-label">Ventas reales</div>
-          <div class="c1-real-val" id="prog-real">17.240 €</div>
+          <div class="c1-real-val" id="prog-real">22.400 €</div>
           <div class="c1-obj-line">
             <span class="c1-obj-label">Objetivo mensual</span>
             <span class="c1-obj-val" id="prog-obj-val">21.000 €</span>
@@ -334,12 +349,12 @@ html, body {
             <div class="bar-meta">
               <span class="bar-name">Progreso esperado hasta hoy</span>
               <div class="bar-right">
-                <span class="bar-val" id="bv-esp">14.000 €</span>
-                <span class="bar-pct" id="bp-esp">66%</span>
+                <span class="bar-val" id="bv-esp">18.000 €</span>
+                <span class="bar-pct" id="bp-esp">86%</span>
               </div>
             </div>
             <div class="bar-track h-md">
-              <div class="bar-fill fill-esp" id="bf-esp" style="width:66.7%"></div>
+              <div class="bar-fill fill-esp" id="bf-esp" style="width:86%"></div>
             </div>
           </div>
 
@@ -347,16 +362,18 @@ html, body {
             <div class="bar-meta">
               <span class="bar-name">Progreso</span>
               <div class="bar-right">
-                <span class="bar-val" id="bv-real">17.240 €</span>
-                <span class="bar-pct" id="bp-real">82%</span>
+                <span class="bar-val" id="bv-real">22.400 €</span>
+                <span class="bar-pct" id="bp-real">107%</span>
               </div>
             </div>
             <div class="bar-track-rel">
               <div class="bar-track h-lg">
-                <div class="bar-fill fill-green" id="bf-real" style="width:82%"></div>
+                <div class="bar-fill fill-black" id="bf-real" style="width:100%"></div>
               </div>
-              <div class="esp-marker" id="esp-marker" style="left:66.7%">
-                <div class="esp-marker-inner"></div>
+              <!-- Marcador verde cuando supera objetivo -->
+              <div class="obj-marker" id="obj-marker" style="left:94%">
+                <div class="obj-marker-label">objetivo</div>
+                <div class="obj-marker-inner"></div>
               </div>
             </div>
           </div>
@@ -383,14 +400,14 @@ html, body {
                 <div class="legend-dot" style="background:var(--gran)"></div>
                 <span class="legend-name" id="name-e1-leg">Kris Yanez</span>
               </div>
-              <span class="legend-val" id="leg-kris-val">10.870 €</span>
+              <span class="legend-val" id="leg-kris-val">14.112 €</span>
             </div>
             <div class="legend-row">
               <div class="legend-left">
                 <div class="legend-dot" style="background:var(--gran-rose)"></div>
                 <span class="legend-name" id="name-e2-leg">Pilar</span>
               </div>
-              <span class="legend-val" id="leg-maria-val">6.370 €</span>
+              <span class="legend-val" id="leg-maria-val">8.288 €</span>
             </div>
           </div>
         </div>
@@ -402,38 +419,40 @@ html, body {
       <div class="card-head"><div class="card-title">Vista bonus</div></div>
       <div class="card-body">
         <div class="bonus-status">
-          <svg id="icon-lock" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          <svg id="icon-lock" style="display:none" width="18" height="18" viewBox="0 0 24 24" fill="none"
             stroke="#B91C1C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="11" width="18" height="11" rx="3"/>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
-          <svg id="icon-party" style="display:none" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          <!-- candado abierto — desbloqueado -->
+          <svg id="icon-unlock" width="18" height="18" viewBox="0 0 24 24" fill="none"
             stroke="#1A6B3C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            <rect x="3" y="11" width="18" height="11" rx="3"/>
+            <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
           </svg>
-          <div class="bonus-title locked" id="bonus-title">Bloqueado</div>
+          <div class="bonus-title unlocked" id="bonus-title">Desbloqueado</div>
         </div>
 
-        <div class="bonus-msg locked-msg" id="bonus-msg">
-          Cada venta cuenta — ¡a por el objetivo!
+        <div class="bonus-msg exceeded-msg" id="bonus-msg">
+          ¡Habéis superado el objetivo del mes en +1.400 €! 🎉
         </div>
 
         <div>
           <div class="bonus-row" id="bonus-row-e1">
             <span class="bonus-row-label" id="name-e1-bonus">Bonus Kris</span>
-            <span class="bonus-row-val zero" id="b-kris">—</span>
+            <span class="bonus-row-val active" id="b-kris">126 €</span>
           </div>
           <div class="bonus-row" id="bonus-row-e2">
             <span class="bonus-row-label" id="name-e2-bonus">Bonus Pilar</span>
-            <span class="bonus-row-val zero" id="b-maria">—</span>
+            <span class="bonus-row-val active" id="b-maria">74 €</span>
           </div>
           <div class="bonus-row" id="bonus-row-c1">
             <span class="bonus-row-label" id="name-e1-com">Comisión Kris</span>
-            <span class="bonus-row-val active" id="c-kris">247 €</span>
+            <span class="bonus-row-val active" id="c-kris">282 €</span>
           </div>
           <div class="bonus-row" id="bonus-row-c2">
             <span class="bonus-row-label" id="name-e2-com">Comisión Pilar</span>
-            <span class="bonus-row-val active" id="c-maria">145 €</span>
+            <span class="bonus-row-val active" id="c-maria">165 €</span>
           </div>
         </div>
 
@@ -442,11 +461,11 @@ html, body {
           <div class="bq-title">Acumulado trimestre</div>
           <div class="bq-row" id="bq-row-e1">
             <span class="bq-name" id="name-e1-bq">Kris Yanez</span>
-            <span class="bq-val" id="bq-kris">350 €</span>
+            <span class="bq-val" id="bq-kris">476 €</span>
           </div>
           <div class="bq-row" id="bq-row-e2">
             <span class="bq-name" id="name-e2-bq">Pilar</span>
-            <span class="bq-val" id="bq-maria">220 €</span>
+            <span class="bq-val" id="bq-maria">294 €</span>
           </div>
         </div>
       </div>
@@ -460,7 +479,7 @@ html, body {
         <!-- KPI — reuses card 1 classes for consistent alignment -->
         <div class="c1-kpi">
           <div class="c1-real-label" id="hoy-subtitle">Total ventas · 20 de abril</div>
-          <div class="c1-real-val" id="hoy-total">632 €</div>
+          <div class="c1-real-val" id="hoy-total">1.250 €</div>
         </div>
 
         <!-- Context — gray shaded -->
@@ -478,7 +497,7 @@ html, body {
             <div class="bar-meta">
               <span class="bar-name">Ventas totales</span>
               <div class="bar-right">
-                <span class="bar-val" id="hbv-total">632 €</span>
+                <span class="bar-val" id="hbv-total">1.250 €</span>
                 <span class="bar-pct" id="hbp-total">100%</span>
               </div>
             </div>
@@ -491,12 +510,12 @@ html, body {
             <div class="bar-meta">
               <span class="bar-name" id="name-e1-bar">Kris Yanez</span>
               <div class="bar-right">
-                <span class="bar-val" id="hbv-kris">400 €</span>
+                <span class="bar-val" id="hbv-kris">787 €</span>
                 <span class="bar-pct" id="hbp-kris">63%</span>
               </div>
             </div>
             <div class="bar-track h-md">
-              <div class="bar-fill" id="hbf-kris" style="width:0%;background:#76323D"></div>
+              <div class="bar-fill" id="hbf-kris" style="width:63%;background:#76323D"></div>
             </div>
           </div>
 
@@ -504,12 +523,12 @@ html, body {
             <div class="bar-meta">
               <span class="bar-name" id="name-e2-bar">Pilar</span>
               <div class="bar-right">
-                <span class="bar-val" id="hbv-maria">232 €</span>
+                <span class="bar-val" id="hbv-maria">463 €</span>
                 <span class="bar-pct" id="hbp-maria">37%</span>
               </div>
             </div>
             <div class="bar-track h-md">
-              <div class="bar-fill" id="hbf-maria" style="width:0%;background:#C4737E"></div>
+              <div class="bar-fill" id="hbf-maria" style="width:37%;background:#C4737E"></div>
             </div>
           </div>
 
@@ -613,7 +632,9 @@ function applyBonusVisibility() {
 const $ = id => document.getElementById(id);
 const fmt = v => {
   if (v == null || isNaN(v)) return '—';
-  return (v < 0 ? '-' : '') + Math.round(Math.abs(v)).toLocaleString('es-ES') + '\u202f€';
+  const n = Math.round(Math.abs(v));
+  const s = n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return (v < 0 ? '-' : '') + s + '\u202f€';
 };
 
 /* ── DONUT with % labels drawn on arcs ── */
@@ -666,23 +687,41 @@ function initDonut() {
 
 /* ── BARS CARD 1 ── */
 function animateBars(obj, esp, real) {
-  const maxVal = Math.max(obj, real, 1);
-  const pObj   = Math.round((obj  / maxVal) * 100);
-  const pEsp   = Math.round((esp  / maxVal) * 100);
-  const pReal  = Math.round((real / maxVal) * 100);
+  const overObj = real >= obj;
+  const maxVal  = Math.max(obj, real, 1);
+  const pObj    = Math.round((obj  / maxVal) * 100);
+  const pEsp    = Math.round((esp  / maxVal) * 100);
+  const pReal   = Math.min(Math.round((real / maxVal) * 100), 100);
 
-  $('bp-obj').textContent  = pObj  + '%';
-  $('bp-esp').textContent  = pEsp  + '%';
-  $('bp-real').textContent = pReal + '%';
+  /* % labels */
+  $('bp-obj').textContent  = '100%';
+  $('bp-esp').textContent  = Math.round((esp  / obj) * 100) + '%';
+  $('bp-real').textContent = Math.round((real / obj) * 100) + '%';
 
-  const isAhead = real >= esp;
-  $('bf-real').className = 'bar-fill ' + (isAhead ? 'fill-green' : 'fill-red');
+  /* Number + % turn green when over objective */
+  const realColor = overObj ? 'var(--green)' : 'var(--ink)';
+  $('bv-real').style.color = realColor;
+  $('bp-real').style.color = overObj ? 'var(--green)' : 'var(--faint)';
+
+  /* Progress bar: black → green when over obj */
+  $('bf-real').className = 'bar-fill ' + (overObj ? 'fill-green' : 'fill-black');
+
+  /* Obj bar: granate for admin, dark for others */
+  $('bf-obj').className = 'bar-fill ' + (currentRole === 'admin' ? 'fill-obj-admin' : 'fill-obj');
+
+  /* Obj-marker: show at 100% line only when real > obj */
+  const marker = $('obj-marker');
+  if (overObj) {
+    marker.style.display = 'block';
+    marker.style.left    = pObj + '%';
+  } else {
+    marker.style.display = 'none';
+  }
 
   setTimeout(() => {
-    $('bf-obj').style.width    = pObj  + '%';
-    $('bf-esp').style.width    = pEsp  + '%';
-    $('bf-real').style.width   = pReal + '%';
-    $('esp-marker').style.left = pEsp  + '%';
+    $('bf-obj').style.width  = pObj  + '%';
+    $('bf-esp').style.width  = pEsp  + '%';
+    $('bf-real').style.width = pReal + '%';
   }, 350);
 }
 
@@ -825,11 +864,11 @@ async function loadData() {
     $('leg-maria-val').textContent = fmt(vMaria);
 
     /* Card 3 — Bonus */
-    const unlocked = bonusSt && String(bonusSt).toLowerCase().includes('des');
     const overObj  = real != null && obj != null && real > obj;
+    const unlocked = (bonusSt && String(bonusSt).toLowerCase().includes('des')) || overObj;
 
-    $('icon-lock').style.display  = unlocked ? 'none'   : 'inline';
-    $('icon-party').style.display = unlocked ? 'inline' : 'none';
+    $('icon-lock').style.display   = unlocked ? 'none'   : 'inline';
+    $('icon-unlock').style.display = unlocked ? 'inline' : 'none';
     const bt = $('bonus-title');
     bt.textContent = unlocked ? 'Desbloqueado' : 'Bloqueado';
     bt.className   = 'bonus-title ' + (unlocked ? 'unlocked' : 'locked');
@@ -837,7 +876,7 @@ async function loadData() {
     const bm = $('bonus-msg');
     if (overObj) {
       const excess = real - obj;
-      bm.textContent = '¡Habéis superado el objetivo del mes en +' + Math.round(excess).toLocaleString('es-ES') + ' €! 🎉';
+      bm.textContent = '¡Habéis superado el objetivo del mes en +' + fmt(excess) + '! 🎉';
       bm.className   = 'bonus-msg exceeded-msg';
     } else {
       const msgs = unlocked ? MSGS_UNLOCKED : MSGS_LOCKED;
