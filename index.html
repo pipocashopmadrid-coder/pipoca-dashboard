@@ -322,10 +322,7 @@ html, body {
         <!-- KPI block — real + objetivo -->
         <div class="c1-kpi">
           <div class="c1-real-label">Ventas reales</div>
-          <div style="display:flex;align-items:baseline;gap:10px;">
-            <div class="c1-real-val" id="prog-real">22.400 €</div>
-            <div id="prog-pct-badge" style="font-size:14px;font-weight:600;color:var(--green);letter-spacing:-0.01em;">107%</div>
-          </div>
+          <div class="c1-real-val" id="prog-real">22.400 €</div>
           <div class="c1-obj-line">
             <span class="c1-obj-label">Objetivo mensual</span>
             <span class="c1-obj-val" id="prog-obj-val">21.000 €</span>
@@ -375,7 +372,7 @@ html, body {
               </div>
               <!-- Marcador verde cuando supera objetivo -->
               <div class="obj-marker" id="obj-marker" style="left:94%">
-                <div class="obj-marker-label"></div>
+                <div class="obj-marker-label">objetivo</div>
                 <div class="obj-marker-inner"></div>
               </div>
             </div>
@@ -700,12 +697,6 @@ function animateBars(obj, esp, real) {
   $('bp-obj').textContent  = '100%';
   $('bp-esp').textContent  = obj > 0 ? Math.round((esp  / obj) * 100) + '%' : '—';
   $('bp-real').textContent = obj > 0 ? Math.round((real / obj) * 100) + '%' : '—';
-
-  /* Big KPI % badge next to number */
-  const pctBig = obj > 0 ? Math.round((real / obj) * 100) : 0;
-  const badge  = $('prog-pct-badge');
-  badge.textContent  = pctBig + '%';
-  badge.style.color  = overObj ? 'var(--green)' : 'var(--muted)';
 
   /* Number + % on the bar row turn green when over objective */
   $('bv-real').style.color = overObj ? 'var(--green)' : 'var(--ink)';
