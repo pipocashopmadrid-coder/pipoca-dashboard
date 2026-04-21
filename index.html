@@ -656,7 +656,7 @@ function animateBars(obj, esp, real) {
   const db   = $('delta-badge');
   dm.textContent = (diff >= 0 ? '+' : '') + fmt(diff);
   db.className   = 'badge ' + (diff >= 0 ? 'badge-ahead' : 'badge-behind');
-  $('delta-sub').textContent = 'adicional a los ' + fmt(esp) + ' planificados hasta hoy';
+  $('delta-sub').textContent = 'adicional a los ' + fmt(esp) + ' previstos hoy';
 
   /* Progress badge */
   const pctReal  = obj > 0 ? Math.round((real / obj) * 100) : 0;
