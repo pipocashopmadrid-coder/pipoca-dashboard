@@ -439,7 +439,7 @@ html, body {
 
         <!-- Quarterly bonus — shaded -->
         <div class="bonus-quarterly">
-          <div class="bq-title">Bonus acumulado trimestre</div>
+          <div class="bq-title">Acumulado trimestre</div>
           <div class="bq-row" id="bq-row-e1">
             <span class="bq-name" id="name-e1-bq">Kris Yanez</span>
             <span class="bq-val" id="bq-kris">350 €</span>
@@ -483,7 +483,7 @@ html, body {
               </div>
             </div>
             <div class="bar-track h-md">
-              <div class="bar-fill fill-obj" id="hbf-total" style="width:100%"></div>
+              <div class="bar-fill fill-obj" id="hbf-total" style="width:0%"></div>
             </div>
           </div>
 
@@ -496,7 +496,7 @@ html, body {
               </div>
             </div>
             <div class="bar-track h-md">
-              <div class="bar-fill" id="hbf-kris" style="width:63%;background:#76323D"></div>
+              <div class="bar-fill" id="hbf-kris" style="width:0%;background:#76323D"></div>
             </div>
           </div>
 
@@ -509,7 +509,7 @@ html, body {
               </div>
             </div>
             <div class="bar-track h-md">
-              <div class="bar-fill" id="hbf-maria" style="width:37%;background:#C4737E"></div>
+              <div class="bar-fill" id="hbf-maria" style="width:0%;background:#C4737E"></div>
             </div>
           </div>
 
@@ -569,7 +569,8 @@ function tryLogin() {
     currentRole = user.role;
     document.getElementById('login').style.display = 'none';
     document.getElementById('app').style.display   = 'flex';
-    applyBonusVisibility(); /* ← aplica visibilidad inmediatamente */
+    applyBonusVisibility();
+    resetSessionTimer();
     initDonut();
     loadData();
   } else {
@@ -687,20 +688,21 @@ function animateBars(obj, esp, real) {
 
 /* ── HORIZONTAL BARS CARD 4 ── */
 function animateHoyBars(hoyK, hoyM, hoyTotal) {
-  const maxVal = Math.max(hoyTotal, hoyK, hoyM, 1);
-  const pTotal = Math.round((hoyTotal / maxVal) * 100);
-  const pK     = Math.round((hoyK     / maxVal) * 100);
-  const pM     = Math.round((hoyM     / maxVal) * 100);
-  /* % relative to total for Kris and María */
-  const pKofT  = hoyTotal > 0 ? Math.round((hoyK  / hoyTotal) * 100) : 0;
-  const pMofT  = hoyTotal > 0 ? Math.round((hoyM  / hoyTotal) * 100) : 0;
+  /* Total bar = 100% always. Kris and María as % of total */
+  const maxVal = Math.max(hoyTotal, 1);
+  const pK    = hoyTotal > 0 ? Math.min(Math.round((hoyK  / maxVal) * 100), 100) : 0;
+  const pM    = hoyTotal > 0 ? Math.min(Math.round((hoyM  / maxVal) * 100), 100) : 0;
+  const pKofT = hoyTotal > 0 ? Math.round((hoyK  / hoyTotal) * 100) : 0;
+  const pMofT = hoyTotal > 0 ? Math.round((hoyM  / hoyTotal) * 100) : 0;
+
   $('hbp-total').textContent = '100%';
   $('hbp-kris').textContent  = pKofT + '%';
   $('hbp-maria').textContent = pMofT + '%';
+
   setTimeout(() => {
-    $('hbf-total').style.width = pTotal + '%';
-    $('hbf-kris').style.width  = pK     + '%';
-    $('hbf-maria').style.width = pM     + '%';
+    $('hbf-total').style.width = '100%';
+    $('hbf-kris').style.width  = pK + '%';
+    $('hbf-maria').style.width = pM + '%';
   }, 380);
 }
 
@@ -862,14 +864,13 @@ async function loadData() {
     const rD = ritmoD || (obj && real && diasRest > 0 ? Math.ceil((obj - real) / diasRest) : null);
 
     const hoyTotal = hoyTot || (hoyK || 0) + (hoyM || 0);
-    $('hoy-subtitle').textContent  = 'Total ventas · ' + diaNum + ' de ' + MESES[mesIdx];
-    $('hoy-total').textContent     = fmt(hoyTotal);
-    $('hoy-ritmo-val').textContent = fmt(rD);
-    $('ctx-ritmo').textContent     = fmt(rD);
-    $('ctx-dias').textContent      = diasRest + (diasRest === 1 ? ' día' : ' días');
-    $('hbv-total').textContent     = fmt(hoyTotal);
-    $('hbv-kris').textContent      = fmt(hoyK);
-    $('hbv-maria').textContent     = fmt(hoyM);
+    $('hoy-subtitle').textContent = 'Total ventas · ' + diaNum + ' de ' + MESES[mesIdx];
+    $('hoy-total').textContent    = fmt(hoyTotal);
+    $('ctx-ritmo').textContent    = fmt(rD);
+    $('ctx-dias').textContent     = diasRest + (diasRest === 1 ? ' día' : ' días');
+    $('hbv-total').textContent    = fmt(hoyTotal);
+    $('hbv-kris').textContent     = fmt(hoyK);
+    $('hbv-maria').textContent    = fmt(hoyM);
 
     animateHoyBars(hoyK || 0, hoyM || 0, hoyTotal || 0);
 
@@ -887,6 +888,27 @@ $('refresh').onclick = loadData;
 
 /* Auto-refresh cada 5 minutos */
 setInterval(loadData, 5 * 60 * 1000);
+
+/* ── SESIÓN: cierre automático a los 5 minutos ── */
+let sessionTimer = null;
+
+function resetSessionTimer() {
+  clearTimeout(sessionTimer);
+  sessionTimer = setTimeout(() => {
+    /* Solo cerrar si el app está visible */
+    if (document.getElementById('app').style.display !== 'none') {
+      document.getElementById('app').style.display   = 'none';
+      document.getElementById('login').style.display = 'flex';
+      document.getElementById('pin').value = '';
+      currentRole = 'admin';
+    }
+  }, 5 * 60 * 1000); /* 5 minutos */
+}
+
+/* Reiniciar el timer en cualquier interacción */
+['click','keydown','touchstart'].forEach(evt =>
+  document.addEventListener(evt, resetSessionTimer, { passive: true })
+);
 </script>
 </body>
 </html>
