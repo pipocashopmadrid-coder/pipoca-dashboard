@@ -240,19 +240,31 @@ html, body {
 /* ══ MOBILE — restore scroll, stack vertically ══ */
 @media (max-width: 600px) {
   html, body { overflow: auto; height: auto; }
-  #app { height: auto; min-height: 100vh; overflow: visible; }
-  .main-grid { grid-template-columns: 1fr; padding: 12px; gap: 12px; overflow: visible; }
-  .card-body { overflow: visible; }
-  .hdr { padding: 12px 14px; }
-  .footer {
-    position: sticky; bottom: 0; z-index: 20;
-    background: var(--gran-dk); /* solid — evita efecto rayado del gradiente */
-    flex-wrap: wrap; gap: 6px; padding: 8px 14px;
+  #app { height: auto; overflow: visible; }
+  .hdr {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+    padding: 12px 16px;
   }
-  #last-upd { font-size: 10px; width: 100%; order: 2; text-align: center; }
-  .footer-btns { order: 1; gap: 8px; }
-  #refresh, #logout { padding: 5px 12px; font-size: 9px; letter-spacing: 0.1em; }
-  .c1-real-val, .hoy-total-val, .c1-real-val { font-size: 32px; }
+  .footer {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
+    background: var(--gran-dk);
+    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+  }
+  #last-upd { font-size: 10px; color: rgba(255,255,255,0.55); flex: 1; }
+  .footer-btns { gap: 8px; flex-shrink: 0; }
+  #refresh, #logout { padding: 6px 12px; font-size: 9px; letter-spacing: 0.1em; }
+  /* Push content away from fixed header/footer */
+  .main-grid {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    padding-top: calc(52px + 12px);   /* header height + gap */
+    padding-bottom: calc(56px + 12px); /* footer height + gap */
+    gap: 12px; overflow: visible;
+  }
+  .card-body { overflow: visible; }
+  .c1-real-val { font-size: 32px; }
 }
 </style>
 </head>
@@ -692,6 +704,9 @@ async function fetchSheet(sheet, range) {
 function val(t, r, c) {
   try { return t.rows[r].c[c] ? t.rows[r].c[c].v : null; } catch { return null; }
 }
+function fval(t, r, c) {
+  try { return t.rows[r].c[c] ? t.rows[r].c[c].f : null; } catch { return null; }
+}
 
 /* ── LOAD ── */
 async function loadData() {
@@ -699,19 +714,35 @@ async function loadData() {
   try {
     const t = await fetchSheet('Dashboard', 'B3:I32');
 
-    /* ── FECHA robusta: C3 puede ser Date(yyyy,m,d) de gviz ── */
-    const rawDate = val(t, 0, 1); // C3
+    /* ── FECHA: 4 estrategias por si gviz devuelve distintos formatos ── */
+    const rawDate = val(t, 0, 1);   // C3 valor bruto
+    const fmtDate = fval(t, 0, 1);  // C3 valor formateado ej. "21/04/2026"
     let diaNum, mesIdx, anoNum;
-    const gvizMatch = rawDate ? String(rawDate).match(/Date\((\d+),(\d+),(\d+)\)/) : null;
-    if (gvizMatch) {
-      anoNum = +gvizMatch[1];
-      mesIdx = +gvizMatch[2]; // gviz month 0-indexed → perfecto para MESES[]
-      diaNum = +gvizMatch[3];
+
+    // Estrategia 1: gviz Date string → "Date(2026,3,21)"
+    const s1 = rawDate ? String(rawDate).match(/Date\((\d+),(\d+),(\d+)/) : null;
+    if (s1) {
+      anoNum = +s1[1]; mesIdx = +s1[2]; diaNum = +s1[3];
     } else {
-      diaNum = val(t, 0, 2) || new Date().getDate();
-      mesIdx = (val(t, 0, 3) || new Date().getMonth() + 1) - 1;
-      anoNum = val(t, 0, 4) || new Date().getFullYear();
+      // Estrategia 2: formatted value → "21/04/2026" o "21/4/2026"
+      const dateStr = fmtDate || (rawDate ? String(rawDate) : '');
+      const s2 = dateStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+      if (s2) {
+        diaNum = +s2[1]; mesIdx = +s2[2] - 1; anoNum = +s2[3];
+      } else {
+        // Estrategia 3: celdas separadas D3/E3/F3
+        const d3 = val(t, 0, 2), e3 = val(t, 0, 3), f3 = val(t, 0, 4);
+        if (d3 != null && e3 != null) {
+          diaNum = Math.round(+d3); mesIdx = Math.round(+e3) - 1; anoNum = +(f3 || new Date().getFullYear());
+        } else {
+          // Estrategia 4: fecha de hoy como fallback
+          const now = new Date();
+          diaNum = now.getDate(); mesIdx = now.getMonth(); anoNum = now.getFullYear();
+        }
+      }
     }
+    /* Sanity check — si mesIdx es inválido usar mes actual */
+    if (mesIdx < 0 || mesIdx > 11 || isNaN(mesIdx)) mesIdx = new Date().getMonth();
 
     /* ── MENSUAL (filas 5-7, índices 2-4, sin filas vacías entre ellas) ── */
     const obj  = val(t, 2, 1); // C5
