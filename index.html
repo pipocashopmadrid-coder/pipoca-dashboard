@@ -314,25 +314,10 @@ html, body {
           </div>
         </div>
 
-        <!-- Two equal badges -->
-        <div class="badge-row">
-          <div class="badge badge-ok" id="prog-badge">
-            <span class="badge-main" id="badge-pct-main">+82% completado</span>
-            <span class="badge-sub" id="badge-pct-sub">vs. 66% planificado hasta hoy</span>
-          </div>
-          <div class="badge badge-ahead" id="delta-badge">
-            <span class="badge-main" id="delta-main">+3.240 €</span>
-            <span class="badge-sub" id="delta-sub">sobre los 14.000 € previstos hoy</span>
-          </div>
-        </div>
-
-        <!-- Separator -->
-        <hr style="border:none;border-top:1px solid var(--border);margin-bottom:8px;">
-
         <!-- 3 bars — scale adjusts when real > obj -->
         <div class="bars-wrap">
 
-          <div class="bar-row">
+          <div class="bar-row" id="bar-row-obj">
             <div class="bar-meta">
               <span class="bar-name">Ventas objetivo</span>
               <div class="bar-right">
@@ -345,7 +330,7 @@ html, body {
             </div>
           </div>
 
-          <div class="bar-row">
+          <div class="bar-row" id="bar-row-esp">
             <div class="bar-meta">
               <span class="bar-name">Progreso esperado hasta hoy</span>
               <div class="bar-right">
@@ -360,7 +345,7 @@ html, body {
 
           <div class="bar-row">
             <div class="bar-meta">
-              <span class="bar-name">Progreso real</span>
+              <span class="bar-name">Progreso</span>
               <div class="bar-right">
                 <span class="bar-val" id="bv-real">17.240 €</span>
                 <span class="bar-pct" id="bp-real">82%</span>
@@ -434,19 +419,19 @@ html, body {
         </div>
 
         <div>
-          <div class="bonus-row">
+          <div class="bonus-row" id="bonus-row-e1">
             <span class="bonus-row-label" id="name-e1-bonus">Bonus Kris</span>
             <span class="bonus-row-val zero" id="b-kris">—</span>
           </div>
-          <div class="bonus-row">
+          <div class="bonus-row" id="bonus-row-e2">
             <span class="bonus-row-label" id="name-e2-bonus">Bonus Pilar</span>
             <span class="bonus-row-val zero" id="b-maria">—</span>
           </div>
-          <div class="bonus-row">
+          <div class="bonus-row" id="bonus-row-c1">
             <span class="bonus-row-label" id="name-e1-com">Comisión Kris</span>
             <span class="bonus-row-val active" id="c-kris">247 €</span>
           </div>
-          <div class="bonus-row">
+          <div class="bonus-row" id="bonus-row-c2">
             <span class="bonus-row-label" id="name-e2-com">Comisión Pilar</span>
             <span class="bonus-row-val active" id="c-maria">145 €</span>
           </div>
@@ -455,11 +440,11 @@ html, body {
         <!-- Quarterly bonus — shaded -->
         <div class="bonus-quarterly">
           <div class="bq-title">Bonus acumulado trimestre</div>
-          <div class="bq-row">
+          <div class="bq-row" id="bq-row-e1">
             <span class="bq-name" id="name-e1-bq">Kris Yanez</span>
             <span class="bq-val" id="bq-kris">350 €</span>
           </div>
-          <div class="bq-row">
+          <div class="bq-row" id="bq-row-e2">
             <span class="bq-name" id="name-e2-bq">Pilar</span>
             <span class="bq-val" id="bq-maria">220 €</span>
           </div>
@@ -476,10 +461,6 @@ html, body {
         <div class="c1-kpi">
           <div class="c1-real-label" id="hoy-subtitle">Total ventas · 20 de abril</div>
           <div class="c1-real-val" id="hoy-total">632 €</div>
-          <div class="c1-obj-line">
-            <span class="c1-obj-label">Mínimo diario</span>
-            <span class="c1-obj-val" id="hoy-ritmo-val">376 €</span>
-          </div>
         </div>
 
         <!-- Context — gray shaded -->
@@ -551,7 +532,19 @@ html, body {
 
 <script>
 const SHEET_ID = '1BHl_W_I8ZcElcXHglFgrM-0tlmFyHR725BUrVvNEJWc';
-const PASSWORD = '2727';
+
+/* ── USUARIOS ─────────────────────────────────────────
+   role: 'admin' ve todo
+   role: 'e1'    solo ve su propio bonus (oculta bonus e2)
+   role: 'e2'    solo ve su propio bonus (oculta bonus e1)
+──────────────────────────────────────────────────────── */
+const USERS = {
+  '2727': { role: 'admin' },
+  '1111': { role: 'e1'    },   /* ← cambia el PIN de Kris  aquí */
+  '2222': { role: 'e2'    },   /* ← cambia el PIN de Pilar aquí */
+};
+
+let currentRole = 'admin';
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio',
                'julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -566,10 +559,14 @@ document.getElementById('logout').onclick  = () => {
   document.getElementById('login').style.display = 'flex';
   document.getElementById('pin').value = '';
   document.getElementById('pin-err').textContent = '';
+  currentRole = 'admin';
 };
 
 function tryLogin() {
-  if (document.getElementById('pin').value === PASSWORD) {
+  const pin  = document.getElementById('pin').value;
+  const user = USERS[pin];
+  if (user) {
+    currentRole = user.role;
     document.getElementById('login').style.display = 'none';
     document.getElementById('app').style.display   = 'flex';
     initDonut();
@@ -579,6 +576,36 @@ function tryLogin() {
     document.getElementById('pin').value = '';
     setTimeout(() => document.getElementById('pin-err').textContent = '', 2000);
   }
+}
+
+/* Ocultar/mostrar elementos según rol */
+function applyBonusVisibility() {
+  const isAdmin = currentRole === 'admin';
+  const isE1    = currentRole === 'e1';
+  const isE2    = currentRole === 'e2';
+
+  /* Card 1: dependientas solo ven barra de progreso, no obj ni esperado */
+  const showAllBars = isAdmin;
+  const bro = document.getElementById('bar-row-obj');
+  const bre = document.getElementById('bar-row-esp');
+  if (bro) bro.style.display = showAllBars ? '' : 'none';
+  if (bre) bre.style.display = showAllBars ? '' : 'none';
+
+  /* Card 3: cada empleada solo ve su propio bonus/comisión/trimestre */
+  const showE1 = isAdmin || isE1;
+  const showE2 = isAdmin || isE2;
+
+  const ids1 = ['bonus-row-e1', 'bonus-row-c1', 'bq-row-e1'];
+  const ids2 = ['bonus-row-e2', 'bonus-row-c2', 'bq-row-e2'];
+
+  ids1.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = showE1 ? '' : 'none';
+  });
+  ids2.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = showE2 ? '' : 'none';
+  });
 }
 
 const $ = id => document.getElementById(id);
@@ -636,42 +663,23 @@ function initDonut() {
 
 /* ── BARS CARD 1 ── */
 function animateBars(obj, esp, real) {
-  /* Scale: use max(obj, real) so real bar can exceed 100% of obj */
-  const maxVal  = Math.max(obj, real, 1);
-  const pObj  = Math.round((obj  / maxVal) * 100);
-  const pEsp  = Math.round((esp  / maxVal) * 100);
-  const pReal = Math.round((real / maxVal) * 100);
-
-  const isAhead = real >= esp;
+  const maxVal = Math.max(obj, real, 1);
+  const pObj   = Math.round((obj  / maxVal) * 100);
+  const pEsp   = Math.round((esp  / maxVal) * 100);
+  const pReal  = Math.round((real / maxVal) * 100);
 
   $('bp-obj').textContent  = pObj  + '%';
   $('bp-esp').textContent  = pEsp  + '%';
   $('bp-real').textContent = pReal + '%';
 
+  const isAhead = real >= esp;
   $('bf-real').className = 'bar-fill ' + (isAhead ? 'fill-green' : 'fill-red');
 
-  /* Delta badge */
-  const diff = real - esp;
-  const dm   = $('delta-main');
-  const db   = $('delta-badge');
-  dm.textContent = (diff >= 0 ? '+' : '') + fmt(diff);
-  db.className   = 'badge ' + (diff >= 0 ? 'badge-ahead' : 'badge-behind');
-  $('delta-sub').textContent = 'sobre los ' + fmt(esp) + ' previstos hoy';
-
-  /* Progress badge */
-  const pctReal  = obj > 0 ? Math.round((real / obj) * 100) : 0;
-  const pctEspOf = obj > 0 ? Math.round((esp  / obj) * 100) : 0;
-  const vsEsp    = pctReal - pctEspOf;
-  const pb = $('prog-badge');
-  pb.querySelector('.badge-main').textContent = (pctReal >= 100 ? '✓ ' : '') + pctReal + '% completado';
-  pb.querySelector('.badge-sub').textContent  = 'vs. ' + pctEspOf + '% planificado hasta hoy';
-  pb.className = 'badge ' + (vsEsp >= 0 ? 'badge-ok' : 'badge-ko');
-
   setTimeout(() => {
-    $('bf-obj').style.width  = pObj  + '%';
-    $('bf-esp').style.width  = pEsp  + '%';
-    $('bf-real').style.width = pReal + '%';
-    $('esp-marker').style.left = pEsp + '%';
+    $('bf-obj').style.width    = pObj  + '%';
+    $('bf-esp').style.width    = pEsp  + '%';
+    $('bf-real').style.width   = pReal + '%';
+    $('esp-marker').style.left = pEsp  + '%';
   }, 350);
 }
 
@@ -843,6 +851,8 @@ async function loadData() {
 
     if (bqKris  != null) $('bq-kris').textContent  = fmt(bqKris);
     if (bqMaria != null) $('bq-maria').textContent = fmt(bqMaria);
+
+    applyBonusVisibility();
 
     /* Card 4 — Vista Diaria */
     const diasMes  = new Date(anoNum, mesIdx + 1, 0).getDate();
