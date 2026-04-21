@@ -322,7 +322,7 @@ html, body {
           </div>
           <div class="badge badge-ahead" id="delta-badge">
             <span class="badge-main" id="delta-main">+3.240 €</span>
-            <span class="badge-sub">vs. planificado hasta hoy</span>
+            <span class="badge-sub" id="delta-sub">sobre los 14.000 € previstos </span>
           </div>
         </div>
 
@@ -656,6 +656,7 @@ function animateBars(obj, esp, real) {
   const db   = $('delta-badge');
   dm.textContent = (diff >= 0 ? '+' : '') + fmt(diff);
   db.className   = 'badge ' + (diff >= 0 ? 'badge-ahead' : 'badge-behind');
+  $('delta-sub').textContent = 'adicional a los ' + fmt(esp) + ' planificados hasta hoy';
 
   /* Progress badge */
   const pctReal  = obj > 0 ? Math.round((real / obj) * 100) : 0;
@@ -663,7 +664,7 @@ function animateBars(obj, esp, real) {
   const vsEsp    = pctReal - pctEspOf;
   const pb = $('prog-badge');
   pb.querySelector('.badge-main').textContent = (pctReal >= 100 ? '✓ ' : '') + pctReal + '% completado';
-  pb.querySelector('.badge-sub').textContent  = '';
+  pb.querySelector('.badge-sub').textContent  = 'vs. ' + pctEspOf + '% planificado hasta hoy';
   pb.className = 'badge ' + (vsEsp >= 0 ? 'badge-ok' : 'badge-ko');
 
   setTimeout(() => {
