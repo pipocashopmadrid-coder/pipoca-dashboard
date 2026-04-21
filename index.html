@@ -322,7 +322,7 @@ html, body {
           </div>
           <div class="badge badge-ahead" id="delta-badge">
             <span class="badge-main" id="delta-main">+3.240 €</span>
-            <span class="badge-sub" id="delta-sub">sobre los 14.000 € previstos </span>
+            <span class="badge-sub" id="delta-sub">sobre los 14.000 € previstos hoy</span>
           </div>
         </div>
 
@@ -656,7 +656,7 @@ function animateBars(obj, esp, real) {
   const db   = $('delta-badge');
   dm.textContent = (diff >= 0 ? '+' : '') + fmt(diff);
   db.className   = 'badge ' + (diff >= 0 ? 'badge-ahead' : 'badge-behind');
-  $('delta-sub').textContent = 'adicional a los ' + fmt(esp) + ' previstos hoy';
+  $('delta-sub').textContent = 'sobre los ' + fmt(esp) + ' previstos hoy';
 
   /* Progress badge */
   const pctReal  = obj > 0 ? Math.round((real / obj) * 100) : 0;
