@@ -569,6 +569,7 @@ function tryLogin() {
     currentRole = user.role;
     document.getElementById('login').style.display = 'none';
     document.getElementById('app').style.display   = 'flex';
+    applyBonusVisibility(); /* ← aplica visibilidad inmediatamente */
     initDonut();
     loadData();
   } else {
@@ -642,6 +643,7 @@ const donutLabelsPlugin = {
 };
 
 function initDonut() {
+  if (donutChart) return; /* ya inicializado */
   const ctx = document.getElementById('donutChart').getContext('2d');
   donutChart = new Chart(ctx, {
     type: 'doughnut',
