@@ -372,7 +372,7 @@ html, body {
               </div>
               <!-- Marcador verde cuando supera objetivo -->
               <div class="obj-marker" id="obj-marker" style="left:94%">
-                <div class="obj-marker-label"></div>
+                <div class="obj-marker-label">objetivo</div>
                 <div class="obj-marker-inner"></div>
               </div>
             </div>
@@ -899,7 +899,12 @@ async function loadData() {
     /* Card 4 — Vista Diaria */
     const diasMes  = new Date(anoNum, mesIdx + 1, 0).getDate();
     const diasRest = Math.max(diasMes - diaNum, 0);
-    const rD = ritmoD || (obj && real && diasRest > 0 ? Math.ceil((obj - real) / diasRest) : null);
+
+    /* rD only meaningful when objective not yet reached */
+    const objReached = real != null && obj != null && real >= obj;
+    const rD = objReached ? null
+      : (ritmoD && ritmoD > 0 ? ritmoD
+        : (obj && real != null && diasRest > 0 ? Math.ceil((obj - real) / diasRest) : null));
 
     const hoyTotal = hoyTot || (hoyK || 0) + (hoyM || 0);
     $('hoy-subtitle').textContent = 'Total ventas · ' + diaNum + ' de ' + MESES[mesIdx];
@@ -908,15 +913,17 @@ async function loadData() {
     $('hbv-kris').textContent     = fmt(hoyK);
     $('hbv-maria').textContent    = fmt(hoyM);
 
-    /* Context message: motivational if objective reached, informational otherwise */
+    /* Total bar: granate when objective reached, black otherwise */
+    $('hbf-total').className = 'bar-fill ' + (objReached ? 'fill-obj-admin' : 'fill-obj');
+
+    /* Context message */
     const ctx = $('hoy-context');
-    const overObjC4 = real != null && obj != null && real >= obj;
-    if (overObjC4) {
+    if (objReached) {
       ctx.innerHTML = '🎉 <strong>¡Objetivo del mes alcanzado!</strong> Cada venta extra suma — recordad que lleváis comisión del <strong>2%</strong> sobre todo lo que vendáis a partir de ahora. ¡A por más!';
+    } else if (rD != null && rD > 0) {
+      ctx.innerHTML = 'Necesitáis vender <strong>al menos ' + fmt(rD) + ' al día los próximos ' + diasRest + (diasRest === 1 ? ' día' : ' días') + ' para alcanzar el objetivo</strong> y desbloquear el bonus.';
     } else {
-      $('ctx-ritmo').textContent = fmt(rD);
-      $('ctx-dias').textContent  = diasRest + (diasRest === 1 ? ' día' : ' días');
-      ctx.innerHTML = 'Necesitáis vender <strong>al menos <span id="ctx-ritmo">' + fmt(rD) + '</span> al día los próximos <span id="ctx-dias">' + (diasRest + (diasRest === 1 ? ' día' : ' días')) + '</span> para alcanzar el objetivo</strong> y desbloquear el bonus.';
+      ctx.innerHTML = '<strong>¡Seguid así!</strong> Cada venta cuenta para llegar al objetivo del mes.';
     }
 
     animateHoyBars(hoyK || 0, hoyM || 0, hoyTotal || 0);
