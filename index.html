@@ -561,11 +561,15 @@ function animateBars(obj, esp, real, diasMes, diaNum) {
   const diasElapsed = Math.max(diaNum, 1);
   const forecast    = Math.round((real / diasElapsed) * diasMes);
 
-  /* All bars scaled relative to obj */
-  const pReal = obj > 0 ? Math.min(Math.round((real / obj) * 100), 100) : 0;
-  const pEsp  = obj > 0 ? Math.min(Math.round((esp  / obj) * 100), 100) : 0;
+  /* Scale: when real > obj, use real as 100% so the bar fills fully
+     and the obj marker sits proportionally at obj/real */
+  const maxVal = Math.max(obj, real, 1);
+  const pReal  = 100; /* real always fills to its own scale */
+  const pEsp   = Math.min(Math.round((esp  / maxVal) * 100), 100);
+  /* Obj marker position: obj as % of maxVal */
+  const pObjMark = Math.round((obj / maxVal) * 100);
 
-  /* % labels */
+  /* % labels — always vs objective */
   $('bp-real').textContent = obj > 0 ? Math.round((real / obj) * 100) + '%' : '—';
   $('bp-esp').textContent  = obj > 0 ? Math.round((esp  / obj) * 100) + '%' : '—';
 
@@ -578,11 +582,11 @@ function animateBars(obj, esp, real, diasMes, diaNum) {
   $('bv-real').style.color = overObj ? 'var(--green)' : 'var(--ink)';
   $('bp-real').style.color = overObj ? 'var(--green)' : 'var(--faint)';
 
-  /* Obj marker on progreso bar — only the line, no label */
+  /* Obj marker — only the line, positioned at obj/maxVal when over obj */
   const marker = $('obj-marker');
   if (overObj) {
     marker.style.display = 'block';
-    marker.style.left    = '100%';
+    marker.style.left    = pObjMark + '%';
   } else {
     marker.style.display = 'none';
   }
@@ -604,9 +608,8 @@ function animateHoyBars(hoyK, hoyM, hoyTotal, objReached) {
   $('hbp-kris').textContent  = pKofT + '%';
   $('hbp-maria').textContent = pMofT + '%';
 
-  /* Total bar: gray if 0, granate if obj reached, black otherwise */
-  const totalClass = hoyTotal <= 0 ? 'fill-gray'
-    : (objReached ? 'fill-admin' : 'fill-black');
+  /* Total bar: gray if 0, always black when there are sales */
+  const totalClass = hoyTotal <= 0 ? 'fill-gray' : 'fill-black';
   $('hbf-total').className = 'bar-fill ' + totalClass;
 
   setTimeout(() => {
