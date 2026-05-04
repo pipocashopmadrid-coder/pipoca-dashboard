@@ -22,7 +22,6 @@
   --faint:     #999;
   --border:    #E0D9D1;
   --gold:      #B07D20;
-  --gold-lt:   #EDBA4A;
   --green:     #1A6B3C;
   --green-bg:  #E6F4ED;
   --green-bd:  #8FCAAC;
@@ -53,7 +52,7 @@ html, body {
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(54px, 7vw, 74px); font-weight: 300;
   letter-spacing: 0.28em; text-transform: uppercase; color: #fff;
-  padding-left: 0.28em; /* visual compensation for trailing letter-spacing */
+  padding-left: 0.28em;
 }
 .login-sub { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.42); margin-top: 8px; padding-left: 0.3em; }
 .login-card {
@@ -98,11 +97,12 @@ html, body {
 }
 .hdr-logo { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; letter-spacing: 0.22em; text-transform: uppercase; color: #fff; }
 
-/* ══ MAIN GRID ══ */
+/* ══ MAIN GRID — 3 cards ══ */
 .main-grid {
   flex: 1; min-height: 0;
   padding: 12px 18px 10px;
-  display: grid; grid-template-columns: 2fr 1.15fr 1.05fr 1.3fr;
+  display: grid;
+  grid-template-columns: 2fr 1.3fr 1.5fr;
   gap: 12px; align-items: stretch;
 }
 
@@ -115,7 +115,6 @@ html, body {
 .card:nth-child(1) { animation-delay: 0.04s; }
 .card:nth-child(2) { animation-delay: 0.10s; }
 .card:nth-child(3) { animation-delay: 0.16s; }
-.card:nth-child(4) { animation-delay: 0.22s; }
 
 .card-head {
   height: 44px; min-height: 44px; max-height: 44px; padding: 0 18px;
@@ -124,27 +123,13 @@ html, body {
 .card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); line-height: 1.3; }
 .card-body { flex: 1; min-height: 0; padding: 14px 18px 16px; display: flex; flex-direction: column; overflow: hidden; }
 
-/* ══ CARD 1 — VENTAS DEL MES ══ */
+/* ══ CARD 1 ══ */
 .c1-kpi { padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
 .c1-real-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 2px; }
 .c1-real-val { font-size: clamp(30px, 3.2vw, 42px); font-weight: 300; line-height: 1; letter-spacing: -0.02em; margin-bottom: 5px; }
 .c1-obj-line { display: flex; align-items: center; gap: 8px; }
 .c1-obj-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
 .c1-obj-val   { font-size: 15px; font-weight: 300; color: var(--gran); letter-spacing: -0.01em; }
-
-/* Badges */
-.badge-row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 12px; }
-.badge {
-  display: flex; align-items: flex-start; justify-content: center; flex-direction: column;
-  padding: 4px 8px; border-radius: 8px;
-  font-size: 10px; font-weight: 600; text-align: left; gap: 1px; line-height: 1.25;
-}
-.badge-ok     { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
-.badge-ko     { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-bd);   }
-.badge-ahead  { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
-.badge-behind { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-bd);   }
-.badge-main   { font-size: 11px; font-weight: 600; }
-.badge-sub    { font-size: 9px; font-weight: 400; opacity: 0.8; }
 
 /* BARS */
 .bars-wrap { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; }
@@ -159,25 +144,21 @@ html, body {
 .bar-track.h-lg { height: 10px; }
 .bar-track.h-md { height:  8px; }
 .bar-fill { height: 100%; border-radius: 5px; transition: width 1.3s cubic-bezier(0.4,0,0.2,1); }
-.fill-obj       { background: #1A1A1A; }
-.fill-obj-admin { background: var(--gran); }
-.fill-esp       { background: #A0A0A0; }
-.fill-black     { background: #1A1A1A; }
-.fill-green     { background: #1A8C4E; }
-.fill-red       { background: #C0392B; }
-.bar-track-rel  { position: relative; }
-/* Obj superado marker */
+.fill-black    { background: #1A1A1A; }
+.fill-admin    { background: var(--gran); }
+.fill-esp      { background: #A0A0A0; }
+.fill-green    { background: #1A8C4E; }
+.fill-forecast { background: #7B9DC4; }   /* azul suave para forecast */
+.fill-gray     { background: #CECAC4; }
+.bar-track-rel { position: relative; }
+/* Marcador objetivo superado */
 .obj-marker {
   position: absolute; top: -3px; height: calc(100% + 6px); width: 2px;
   pointer-events: none; display: none;
 }
-.obj-marker-inner {
-  width: 100%; height: 100%;
-  background: var(--green); border-radius: 1px;
-}
+.obj-marker-inner { width: 100%; height: 100%; background: var(--green); border-radius: 1px; }
 .obj-marker-label {
-  position: absolute; top: -14px; left: 50%;
-  transform: translateX(-50%);
+  position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
   font-size: 8px; font-weight: 600; color: var(--green);
   white-space: nowrap; letter-spacing: 0.04em;
 }
@@ -185,40 +166,15 @@ html, body {
 /* ══ CARD 2 — DONUT ══ */
 .card-subtitle { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; width: 100%; text-align: left; }
 .donut-centered { display: flex; flex-direction: column; align-items: center; width: 100%; flex: 1; justify-content: flex-start; padding-top: 4px; }
-.donut-wrap  { width: 130px; height: 130px; margin-bottom: 10px; position: relative; }
-.donut-legend { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.donut-wrap  { width: 138px; height: 138px; margin-bottom: 12px; }
+.donut-legend { width: 100%; display: flex; flex-direction: column; gap: 8px; }
 .legend-row   { display: flex; align-items: center; justify-content: space-between; }
 .legend-left  { display: flex; align-items: center; gap: 8px; }
 .legend-dot   { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .legend-name  { font-size: 11px; font-weight: 500; color: var(--muted); }
 .legend-val   { font-size: 15px; font-weight: 300; letter-spacing: -0.01em; }
 
-/* ══ CARD 3 — BONUS ══ */
-.bonus-status { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-.bonus-title  { font-size: 15px; font-weight: 600; }
-.bonus-title.unlocked { color: var(--green); }
-.bonus-title.locked   { color: var(--red); }
-.bonus-msg { font-size: 11px; line-height: 1.45; margin-bottom: 10px; padding: 7px 10px; border-radius: var(--radius-sm); }
-.bonus-msg.locked-msg   { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-bd);   }
-.bonus-msg.unlocked-msg { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bd); }
-.bonus-msg.exceeded-msg { background: #E8F4ED; color: var(--green); border: 1px solid var(--green-bd); font-weight: 500; }
-
-.bonus-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); }
-.bonus-row:last-child { border-bottom: none; }
-.bonus-row-label { font-size: 11px; font-weight: 500; color: var(--muted); }
-.bonus-row-val   { font-size: 14px; font-weight: 400; letter-spacing: -0.01em; }
-.bonus-row-val.active { color: #3A3A3A; }
-.bonus-row-val.zero   { color: var(--border); }
-
-/* Quarterly bonus section */
-.bonus-quarterly { margin-top: 10px; border-radius: var(--radius-sm); background: #F5F2EB; border: 1px solid var(--border); padding: 8px 12px; }
-.bq-title { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 7px; }
-.bq-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--border); }
-.bq-row:last-child { border-bottom: none; }
-.bq-name { font-size: 11px; font-weight: 500; color: var(--muted); }
-.bq-val  { font-size: 15px; font-weight: 300; letter-spacing: -0.01em; color: var(--gold); }
-
-/* ══ CARD 4 — VISTA DIARIA ══ */
+/* ══ CARD 3 — VISTA DIARIA ══ */
 .hoy-context {
   background: #EEEBE5; border-radius: var(--radius-sm);
   padding: 6px 10px; margin-bottom: 0;
@@ -248,34 +204,27 @@ html, body {
 @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ══ TABLET ══ */
-@media (max-width: 1040px) and (min-width: 601px) {
+@media (max-width: 900px) and (min-width: 601px) {
   .main-grid { grid-template-columns: 1fr 1fr; }
+  .main-grid .card:first-child { grid-column: 1 / -1; }
 }
 
-/* ══ MOBILE — restore scroll, stack vertically ══ */
+/* ══ MOBILE ══ */
 @media (max-width: 600px) {
   html, body { overflow: auto; height: auto; }
   #app { height: auto; overflow: visible; }
-  .hdr {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 30;
-    padding: 12px 16px;
-  }
+  .hdr { position: fixed; top: 0; left: 0; right: 0; z-index: 30; padding: 12px 16px; }
   .footer {
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
-    background: var(--gran-dk);
-    padding: 14px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 10px;
+    background: var(--gran-dk); padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
   }
   #last-upd { font-size: 10px; color: rgba(255,255,255,0.55); flex: 1; }
   .footer-btns { gap: 8px; flex-shrink: 0; }
   #refresh, #logout { padding: 6px 12px; font-size: 9px; letter-spacing: 0.1em; }
-  /* Push content away from fixed header/footer */
   .main-grid {
-    grid-template-columns: 1fr;
-    padding: 12px;
-    padding-top: calc(52px + 12px);   /* header height + gap */
-    padding-bottom: calc(56px + 12px); /* footer height + gap */
+    grid-template-columns: 1fr; padding: 12px;
+    padding-top: calc(52px + 12px); padding-bottom: calc(56px + 12px);
     gap: 12px; overflow: visible;
   }
   .card-body { overflow: visible; }
@@ -319,7 +268,6 @@ html, body {
       <div class="card-head"><div class="card-title">Vista mensual general</div></div>
       <div class="card-body">
 
-        <!-- KPI block — real + objetivo -->
         <div class="c1-kpi">
           <div class="c1-real-label">Ventas reales</div>
           <div class="c1-real-val" id="prog-real">22.400 €</div>
@@ -329,22 +277,29 @@ html, body {
           </div>
         </div>
 
-        <!-- 3 bars — scale adjusts when real > obj -->
         <div class="bars-wrap">
 
-          <div class="bar-row" id="bar-row-obj">
+          <!-- Progreso (todos los usuarios) -->
+          <div class="bar-row">
             <div class="bar-meta">
-              <span class="bar-name">Ventas objetivo</span>
+              <span class="bar-name">Progreso</span>
               <div class="bar-right">
-                <span class="bar-val" id="bv-obj">21.000 €</span>
-                <span class="bar-pct" id="bp-obj">100%</span>
+                <span class="bar-val" id="bv-real">22.400 €</span>
+                <span class="bar-pct" id="bp-real">107%</span>
               </div>
             </div>
-            <div class="bar-track h-lg">
-              <div class="bar-fill fill-obj" id="bf-obj" style="width:100%"></div>
+            <div class="bar-track-rel">
+              <div class="bar-track h-lg">
+                <div class="bar-fill fill-green" id="bf-real" style="width:100%"></div>
+              </div>
+              <div class="obj-marker" id="obj-marker" style="left:94%">
+                <div class="obj-marker-label">objetivo</div>
+                <div class="obj-marker-inner"></div>
+              </div>
             </div>
           </div>
 
+          <!-- Progreso esperado (solo admin) -->
           <div class="bar-row" id="bar-row-esp">
             <div class="bar-meta">
               <span class="bar-name">Progreso esperado hasta hoy</span>
@@ -358,23 +313,17 @@ html, body {
             </div>
           </div>
 
-          <div class="bar-row">
+          <!-- Previsión a fin de mes (solo admin) -->
+          <div class="bar-row" id="bar-row-forecast">
             <div class="bar-meta">
-              <span class="bar-name">Progreso</span>
+              <span class="bar-name">Previsión a fin de mes</span>
               <div class="bar-right">
-                <span class="bar-val" id="bv-real">22.400 €</span>
-                <span class="bar-pct" id="bp-real">107%</span>
+                <span class="bar-val" id="bv-forecast">25.000 €</span>
+                <span class="bar-pct" id="bp-forecast">119%</span>
               </div>
             </div>
-            <div class="bar-track-rel">
-              <div class="bar-track h-lg">
-                <div class="bar-fill fill-black" id="bf-real" style="width:100%"></div>
-              </div>
-              <!-- Marcador verde cuando supera objetivo -->
-              <div class="obj-marker" id="obj-marker" style="left:94%">
-                <div class="obj-marker-label"></div>
-                <div class="obj-marker-inner"></div>
-              </div>
+            <div class="bar-track h-md">
+              <div class="bar-fill fill-forecast" id="bf-forecast" style="width:95%"></div>
             </div>
           </div>
 
@@ -383,16 +332,13 @@ html, body {
     </div>
 
     <!-- ② VISTA MENSUAL INDIVIDUAL -->
-    <div class="card card-donut">
+    <div class="card">
       <div class="card-head"><div class="card-title">Vista mensual individual</div></div>
       <div class="card-body">
         <div class="card-subtitle">Ventas reales por empleada</div>
         <div class="donut-centered">
           <div class="donut-wrap">
-            <canvas id="donutChart" role="img"
-              aria-label="Reparto de ventas del mes: Kris y María">
-              Kris y María.
-            </canvas>
+            <canvas id="donutChart" role="img" aria-label="Reparto de ventas del mes">Kris y Pilar.</canvas>
           </div>
           <div class="donut-legend">
             <div class="legend-row">
@@ -414,83 +360,22 @@ html, body {
       </div>
     </div>
 
-    <!-- ③ VISTA BONUS -->
-    <div class="card">
-      <div class="card-head"><div class="card-title">Vista bonus</div></div>
-      <div class="card-body">
-        <div class="bonus-status">
-          <svg id="icon-lock" style="display:none" width="18" height="18" viewBox="0 0 24 24" fill="none"
-            stroke="#B91C1C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="3"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-          <!-- candado abierto — desbloqueado -->
-          <svg id="icon-unlock" width="18" height="18" viewBox="0 0 24 24" fill="none"
-            stroke="#1A6B3C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="3"/>
-            <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
-          </svg>
-          <div class="bonus-title unlocked" id="bonus-title">Desbloqueado</div>
-        </div>
-
-        <div class="bonus-msg exceeded-msg" id="bonus-msg">
-          ¡Habéis superado el objetivo del mes en +1.400 €! 🎉
-        </div>
-
-        <div>
-          <div class="bonus-row" id="bonus-row-e1">
-            <span class="bonus-row-label" id="name-e1-bonus">Bonus Kris</span>
-            <span class="bonus-row-val active" id="b-kris">126 €</span>
-          </div>
-          <div class="bonus-row" id="bonus-row-e2">
-            <span class="bonus-row-label" id="name-e2-bonus">Bonus Pilar</span>
-            <span class="bonus-row-val active" id="b-maria">74 €</span>
-          </div>
-          <div class="bonus-row" id="bonus-row-c1">
-            <span class="bonus-row-label" id="name-e1-com">Comisión Kris</span>
-            <span class="bonus-row-val active" id="c-kris">282 €</span>
-          </div>
-          <div class="bonus-row" id="bonus-row-c2">
-            <span class="bonus-row-label" id="name-e2-com">Comisión Pilar</span>
-            <span class="bonus-row-val active" id="c-maria">165 €</span>
-          </div>
-        </div>
-
-        <!-- Quarterly bonus — shaded -->
-        <div class="bonus-quarterly">
-          <div class="bq-title">Acumulado trimestre</div>
-          <div class="bq-row" id="bq-row-e1">
-            <span class="bq-name" id="name-e1-bq">Kris Yanez</span>
-            <span class="bq-val" id="bq-kris">476 €</span>
-          </div>
-          <div class="bq-row" id="bq-row-e2">
-            <span class="bq-name" id="name-e2-bq">Pilar</span>
-            <span class="bq-val" id="bq-maria">294 €</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ④ VISTA DIARIA -->
+    <!-- ③ VISTA DIARIA -->
     <div class="card">
       <div class="card-head"><div class="card-title">Vista diaria</div></div>
       <div class="card-body">
 
-        <!-- KPI — reuses card 1 classes for consistent alignment -->
         <div class="c1-kpi">
           <div class="c1-real-label" id="hoy-subtitle">Total ventas · 20 de abril</div>
           <div class="c1-real-val" id="hoy-total">1.250 €</div>
         </div>
 
-        <!-- Context — gray shaded -->
         <div class="hoy-context" id="hoy-context">
           🎉 <strong>¡Objetivo del mes alcanzado!</strong> Cada venta extra suma — recordad que lleváis comisión del <strong>2%</strong> sobre todo lo que vendáis a partir de ahora. ¡A por más!
         </div>
 
-        <!-- Divider before bars -->
         <hr class="hoy-divider">
 
-        <!-- 3 horizontal bars: Total, Kris, María -->
         <div class="bars-wrap">
 
           <div class="bar-row">
@@ -502,7 +387,7 @@ html, body {
               </div>
             </div>
             <div class="bar-track h-md">
-              <div class="bar-fill fill-obj" id="hbf-total" style="width:0%"></div>
+              <div class="bar-fill fill-black" id="hbf-total" style="width:100%"></div>
             </div>
           </div>
 
@@ -533,7 +418,6 @@ html, body {
           </div>
 
         </div>
-
       </div>
     </div>
 
@@ -552,24 +436,16 @@ html, body {
 <script>
 const SHEET_ID = '1BHl_W_I8ZcElcXHglFgrM-0tlmFyHR725BUrVvNEJWc';
 
-/* ── USUARIOS ─────────────────────────────────────────
-   role: 'admin' ve todo
-   role: 'e1'    solo ve su propio bonus (oculta bonus e2)
-   role: 'e2'    solo ve su propio bonus (oculta bonus e1)
-──────────────────────────────────────────────────────── */
 const USERS = {
   '2727': { role: 'admin' },
-  '1111': { role: 'e1'    },   /* ← cambia el PIN de Kris  aquí */
-  '2222': { role: 'e2'    },   /* ← cambia el PIN de Pilar aquí */
+  '1111': { role: 'e1'    },   /* ← PIN de Kris  */
+  '2222': { role: 'e2'    },   /* ← PIN de Pilar */
 };
 
 let currentRole = 'admin';
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio',
                'julio','agosto','septiembre','octubre','noviembre','diciembre'];
-
-const MSGS_LOCKED   = ['Cada venta cuenta — ¡a por el objetivo!','¡Ánimo! Estáis más cerca de lo que creéis.','El bonus está a vuestro alcance. ¡A empujar!'];
-const MSGS_UNLOCKED = ['¡Fantástico! El bonus del equipo está desbloqueado.','¡Enhorabuena! Lo habéis conseguido.','¡Increíble trabajo! El bonus es vuestro.'];
 
 document.getElementById('pin-btn').onclick = tryLogin;
 document.getElementById('pin').onkeydown   = e => { if (e.key === 'Enter') tryLogin(); };
@@ -588,7 +464,7 @@ function tryLogin() {
     currentRole = user.role;
     document.getElementById('login').style.display = 'none';
     document.getElementById('app').style.display   = 'flex';
-    applyBonusVisibility();
+    applyVisibility();
     resetSessionTimer();
     initDonut();
     loadData();
@@ -599,37 +475,18 @@ function tryLogin() {
   }
 }
 
-/* Ocultar/mostrar elementos según rol */
-function applyBonusVisibility() {
+/* Ocultar/mostrar según rol */
+function applyVisibility() {
   const isAdmin = currentRole === 'admin';
-  const isE1    = currentRole === 'e1';
-  const isE2    = currentRole === 'e2';
-
-  /* Card 1: dependientas solo ven barra de progreso, no obj ni esperado */
-  const showAllBars = isAdmin;
-  const bro = document.getElementById('bar-row-obj');
-  const bre = document.getElementById('bar-row-esp');
-  if (bro) bro.style.display = showAllBars ? '' : 'none';
-  if (bre) bre.style.display = showAllBars ? '' : 'none';
-
-  /* Card 3: cada empleada solo ve su propio bonus/comisión/trimestre */
-  const showE1 = isAdmin || isE1;
-  const showE2 = isAdmin || isE2;
-
-  const ids1 = ['bonus-row-e1', 'bonus-row-c1', 'bq-row-e1'];
-  const ids2 = ['bonus-row-e2', 'bonus-row-c2', 'bq-row-e2'];
-
-  ids1.forEach(id => {
+  /* Card 1: esp y forecast solo para admin */
+  ['bar-row-esp','bar-row-forecast'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = showE1 ? '' : 'none';
-  });
-  ids2.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = showE2 ? '' : 'none';
+    if (el) el.style.display = isAdmin ? '' : 'none';
   });
 }
 
 const $ = id => document.getElementById(id);
+
 const fmt = v => {
   if (v == null || isNaN(v)) return '—';
   const n = Math.round(Math.abs(v));
@@ -637,7 +494,7 @@ const fmt = v => {
   return (v < 0 ? '-' : '') + s + '\u202f€';
 };
 
-/* ── DONUT with % labels drawn on arcs ── */
+/* ── DONUT ── */
 let donutChart = null;
 
 const donutLabelsPlugin = {
@@ -647,6 +504,8 @@ const donutLabelsPlugin = {
     chart.data.datasets.forEach((dataset, di) => {
       const meta = chart.getDatasetMeta(di);
       meta.data.forEach((arc, i) => {
+        /* Only draw label if segment is big enough */
+        if (dataset.data[i] < 5) return;
         const props = arc.getProps(['x','y','startAngle','endAngle','innerRadius','outerRadius'], true);
         const midAngle = (props.startAngle + props.endAngle) / 2;
         const r = (props.innerRadius + props.outerRadius) / 2;
@@ -665,13 +524,13 @@ const donutLabelsPlugin = {
 };
 
 function initDonut() {
-  if (donutChart) return; /* ya inicializado */
+  if (donutChart) return;
   const ctx = document.getElementById('donutChart').getContext('2d');
   donutChart = new Chart(ctx, {
     type: 'doughnut',
     plugins: [donutLabelsPlugin],
     data: {
-      labels: ['Kris Yanez', 'María Martín'],
+      labels: ['Kris Yanez', 'Pilar'],
       datasets: [{ data: [63, 37], backgroundColor: ['#76323D','#C4737E'], borderColor: ['#fff','#fff'], borderWidth: 3, hoverOffset: 5 }]
     },
     options: {
@@ -685,51 +544,72 @@ function initDonut() {
   });
 }
 
+function updateDonut(pK, pM, noData) {
+  if (!donutChart) return;
+  if (noData) {
+    /* Both zero: show neutral gray */
+    donutChart.data.datasets[0].data = [50, 50];
+    donutChart.data.datasets[0].backgroundColor = ['#CECAC4','#E0D9D1'];
+  } else {
+    donutChart.data.datasets[0].data = [pK, pM];
+    donutChart.data.datasets[0].backgroundColor = ['#76323D','#C4737E'];
+  }
+  donutChart.update();
+  $('leg-kris-val').style.opacity  = noData ? '0.35' : '1';
+  $('leg-maria-val').style.opacity = noData ? '0.35' : '1';
+}
+
 /* ── BARS CARD 1 ── */
-function animateBars(obj, esp, real) {
+function animateBars(obj, esp, real, diasMes, diaNum) {
   const overObj = real >= obj;
-  const maxVal  = Math.max(obj, real, 1);
-  const pObj    = Math.round((obj  / maxVal) * 100);
-  const pEsp    = Math.round((esp  / maxVal) * 100);
-  const pReal   = Math.min(Math.round((real / maxVal) * 100), 100);
 
-  /* % labels on bars */
-  $('bp-obj').textContent  = '100%';
-  $('bp-esp').textContent  = obj > 0 ? Math.round((esp  / obj) * 100) + '%' : '—';
-  $('bp-real').textContent = obj > 0 ? Math.round((real / obj) * 100) + '%' : '—';
+  /* Reference scale: max of obj, real, forecast so all bars fit */
+  const diasElapsed = Math.max(diaNum, 1);
+  const forecast    = Math.round((real / diasElapsed) * diasMes);
+  const maxVal      = Math.max(obj, real, forecast, 1);
 
-  /* Number + % on the bar row turn green when over objective */
+  const pReal     = Math.min(Math.round((real     / maxVal) * 100), 100);
+  const pEsp      = Math.min(Math.round((esp      / maxVal) * 100), 100);
+  const pForecast = Math.min(Math.round((forecast / maxVal) * 100), 100);
+  /* Marker at obj position in the scale */
+  const pObjMark  = Math.min(Math.round((obj      / maxVal) * 100), 100);
+
+  /* % vs objective labels */
+  $('bp-real').textContent     = obj > 0 ? Math.round((real     / obj) * 100) + '%' : '—';
+  $('bp-esp').textContent      = obj > 0 ? Math.round((esp      / obj) * 100) + '%' : '—';
+  $('bp-forecast').textContent = obj > 0 ? Math.round((forecast / obj) * 100) + '%' : '—';
+  $('bv-forecast').textContent = fmt(forecast);
+
+  /* Colors */
+  $('bf-real').className = 'bar-fill ' + (overObj ? 'fill-green' : 'fill-black');
   $('bv-real').style.color = overObj ? 'var(--green)' : 'var(--ink)';
   $('bp-real').style.color = overObj ? 'var(--green)' : 'var(--faint)';
 
-  /* Progress bar: black → green when over obj */
-  $('bf-real').className = 'bar-fill ' + (overObj ? 'fill-green' : 'fill-black');
+  const forecastOk = forecast >= obj;
+  $('bf-forecast').className = 'bar-fill ' + (forecastOk ? 'fill-green' : 'fill-forecast');
+  $('bv-forecast').style.color = forecastOk ? 'var(--green)' : 'var(--ink)';
+  $('bp-forecast').style.color = forecastOk ? 'var(--green)' : 'var(--faint)';
 
-  /* Obj bar: granate for admin, dark for others */
-  $('bf-obj').className = 'bar-fill ' + (currentRole === 'admin' ? 'fill-obj-admin' : 'fill-obj');
-
-  /* Obj-marker: show at 100% line only when real > obj */
+  /* Obj marker on progreso bar */
   const marker = $('obj-marker');
   if (overObj) {
     marker.style.display = 'block';
-    marker.style.left    = pObj + '%';
+    marker.style.left    = pObjMark + '%';
   } else {
     marker.style.display = 'none';
   }
 
   setTimeout(() => {
-    $('bf-obj').style.width  = pObj  + '%';
-    $('bf-esp').style.width  = pEsp  + '%';
-    $('bf-real').style.width = pReal + '%';
+    $('bf-real').style.width     = pReal     + '%';
+    $('bf-esp').style.width      = pEsp      + '%';
+    $('bf-forecast').style.width = pForecast + '%';
   }, 350);
 }
 
-/* ── HORIZONTAL BARS CARD 4 ── */
-function animateHoyBars(hoyK, hoyM, hoyTotal) {
-  /* Total bar = 100% always. Kris and María as % of total */
-  const maxVal = Math.max(hoyTotal, 1);
-  const pK    = hoyTotal > 0 ? Math.min(Math.round((hoyK  / maxVal) * 100), 100) : 0;
-  const pM    = hoyTotal > 0 ? Math.min(Math.round((hoyM  / maxVal) * 100), 100) : 0;
+/* ── BARS CARD 3 (Hoy) ── */
+function animateHoyBars(hoyK, hoyM, hoyTotal, objReached) {
+  const pK    = hoyTotal > 0 ? Math.min(Math.round((hoyK  / hoyTotal) * 100), 100) : 0;
+  const pM    = hoyTotal > 0 ? Math.min(Math.round((hoyM  / hoyTotal) * 100), 100) : 0;
   const pKofT = hoyTotal > 0 ? Math.round((hoyK  / hoyTotal) * 100) : 0;
   const pMofT = hoyTotal > 0 ? Math.round((hoyM  / hoyTotal) * 100) : 0;
 
@@ -737,8 +617,13 @@ function animateHoyBars(hoyK, hoyM, hoyTotal) {
   $('hbp-kris').textContent  = pKofT + '%';
   $('hbp-maria').textContent = pMofT + '%';
 
+  /* Total bar: gray if 0, granate if obj reached, black otherwise */
+  const totalClass = hoyTotal <= 0 ? 'fill-gray'
+    : (objReached ? 'fill-admin' : 'fill-black');
+  $('hbf-total').className = 'bar-fill ' + totalClass;
+
   setTimeout(() => {
-    $('hbf-total').style.width = '100%';
+    $('hbf-total').style.width = hoyTotal > 0 ? '100%' : '0%';
     $('hbf-kris').style.width  = pK + '%';
     $('hbf-maria').style.width = pM + '%';
   }, 380);
@@ -765,142 +650,74 @@ async function loadData() {
   try {
     const t = await fetchSheet('Dashboard', 'B3:I32');
 
-    /* ── FECHA: 4 estrategias por si gviz devuelve distintos formatos ── */
-    const rawDate = val(t, 0, 1);   // C3 valor bruto
-    const fmtDate = fval(t, 0, 1);  // C3 valor formateado ej. "21/04/2026"
+    /* FECHA */
+    const rawDate = val(t, 0, 1);
+    const fmtDate = fval(t, 0, 1);
     let diaNum, mesIdx, anoNum;
-
-    // Estrategia 1: gviz Date string → "Date(2026,3,21)"
     const s1 = rawDate ? String(rawDate).match(/Date\((\d+),(\d+),(\d+)/) : null;
     if (s1) {
       anoNum = +s1[1]; mesIdx = +s1[2]; diaNum = +s1[3];
     } else {
-      // Estrategia 2: formatted value → "21/04/2026" o "21/4/2026"
       const dateStr = fmtDate || (rawDate ? String(rawDate) : '');
       const s2 = dateStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
       if (s2) {
         diaNum = +s2[1]; mesIdx = +s2[2] - 1; anoNum = +s2[3];
       } else {
-        // Estrategia 3: celdas separadas D3/E3/F3
-        const d3 = val(t, 0, 2), e3 = val(t, 0, 3), f3 = val(t, 0, 4);
+        const d3 = val(t,0,2), e3 = val(t,0,3), f3 = val(t,0,4);
         if (d3 != null && e3 != null) {
           diaNum = Math.round(+d3); mesIdx = Math.round(+e3) - 1; anoNum = +(f3 || new Date().getFullYear());
         } else {
-          // Estrategia 4: fecha de hoy como fallback
           const now = new Date();
           diaNum = now.getDate(); mesIdx = now.getMonth(); anoNum = now.getFullYear();
         }
       }
     }
-    /* Sanity check — si mesIdx es inválido usar mes actual */
     if (mesIdx < 0 || mesIdx > 11 || isNaN(mesIdx)) mesIdx = new Date().getMonth();
 
-    /* ── MENSUAL (filas 5-7, índices 2-4, sin filas vacías entre ellas) ── */
-    const obj  = val(t, 2, 1); // C5
-    const esp  = val(t, 3, 1); // C6
-    const real = val(t, 4, 1); // C7
-
-    /* ── EMPLEADAS (filas 10-13, índices 5-8: filas 8 y 9 vacías → saltadas) ── */
-    const vKris  = val(t, 5, 1); // C10
-    const pKris  = val(t, 6, 1); // C11
-    const vMaria = val(t, 7, 1); // C12
-    const pMaria = val(t, 8, 1); // C13
-
-    /* ── BONUS (filas 15-19, índices 9-13: fila 14 vacía → saltada) ── */
-    const bonusSt = val(t,  9, 1); // C15
-    const bKris   = val(t, 10, 1); // C16
-    const bMaria  = val(t, 11, 1); // C17
-    const cKris   = val(t, 12, 1); // C18
-    const cMaria  = val(t, 13, 1); // C19
-
-    /* ── DIARIO (filas 22-25, índices 15-18: filas 20 y 21 saltadas/header) ── */
+    /* DATOS */
+    const obj    = val(t,  2, 1); // C5
+    const esp    = val(t,  3, 1); // C6
+    const real   = val(t,  4, 1); // C7
+    const vKris  = val(t,  5, 1); // C10
+    const pKris  = val(t,  6, 1); // C11
+    const vMaria = val(t,  7, 1); // C12
+    const pMaria = val(t,  8, 1); // C13
     const ritmoD = val(t, 15, 1); // C22
     const hoyTot = val(t, 16, 1); // C23
     const hoyK   = val(t, 17, 1); // C24
     const hoyM   = val(t, 18, 1); // C25
 
-    /* ── TRIMESTRE (filas 27-28, índices 19-20: fila 26 vacía → saltada) ── */
-    const bqKris  = val(t, 19, 1); // C27
-    const bqMaria = val(t, 20, 1); // C28
-
-    /* ── NOMBRES desde I4 (índice 1, col 7) e I5 (índice 2, col 7) ── */
-    const nameE1 = (val(t, 1, 7) || 'Empleada 1').trim();
-    const nameE2 = (val(t, 2, 7) || 'Empleada 2').trim();
+    /* NOMBRES */
+    const nameE1  = (val(t, 1, 7) || 'Empleada 1').trim();
+    const nameE2  = (val(t, 2, 7) || 'Empleada 2').trim();
     const firstE1 = nameE1.split(' ')[0];
     const firstE2 = nameE2.split(' ')[0];
-    const initialsE1 = nameE1.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
-    const initialsE2 = nameE2.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+    $('name-e1-leg').textContent = nameE1;
+    $('name-e2-leg').textContent = nameE2;
+    $('name-e1-bar').textContent = nameE1;
+    $('name-e2-bar').textContent = nameE2;
 
-    /* Propagate names everywhere */
-    $('name-e1-leg').textContent  = nameE1;
-    $('name-e2-leg').textContent  = nameE2;
-    $('name-e1-bonus').textContent = 'Bonus ' + firstE1;
-    $('name-e2-bonus').textContent = 'Bonus ' + firstE2;
-    $('name-e1-com').textContent  = 'Comisión ' + firstE1;
-    $('name-e2-com').textContent  = 'Comisión ' + firstE2;
-    $('name-e1-bq').textContent   = nameE1;
-    $('name-e2-bq').textContent   = nameE2;
-    $('name-e1-bar').textContent  = nameE1;
-    $('name-e2-bar').textContent  = nameE2;
-
-    /* Card 1 */
+    /* CARD 1 */
+    const diasMes  = new Date(anoNum, mesIdx + 1, 0).getDate();
     $('prog-real').textContent    = fmt(real);
     $('prog-obj-val').textContent = fmt(obj);
-    $('bv-obj').textContent       = fmt(obj);
     $('bv-esp').textContent       = fmt(esp);
     $('bv-real').textContent      = fmt(real);
-    animateBars(obj || 1, esp || 0, real || 0);
+    animateBars(obj || 1, esp || 0, real || 0, diasMes, diaNum);
 
-    /* Card 2 — Donut */
+    /* CARD 2 */
+    const pK = Math.round((pKris  || 0) * 100);
+    const pM = Math.round((pMaria || 0) * 100);
+    const noData = (pK === 0 && pM === 0) || (vKris == null && vMaria == null);
     if (donutChart) {
-      const pK = Math.round((pKris  || 0) * 100);
-      const pM = 100 - pK;
       donutChart.data.labels = [nameE1, nameE2];
-      donutChart.data.datasets[0].data = [pK, pM];
-      donutChart.update();
+      updateDonut(pK || 50, pM || 50, noData);
     }
     $('leg-kris-val').textContent  = fmt(vKris);
     $('leg-maria-val').textContent = fmt(vMaria);
 
-    /* Card 3 — Bonus */
-    const overObj  = real != null && obj != null && real > obj;
-    const unlocked = (bonusSt && String(bonusSt).toLowerCase().includes('des')) || overObj;
-
-    $('icon-lock').style.display   = unlocked ? 'none'   : 'inline';
-    $('icon-unlock').style.display = unlocked ? 'inline' : 'none';
-    const bt = $('bonus-title');
-    bt.textContent = unlocked ? 'Desbloqueado' : 'Bloqueado';
-    bt.className   = 'bonus-title ' + (unlocked ? 'unlocked' : 'locked');
-
-    const bm = $('bonus-msg');
-    if (overObj) {
-      const excess = real - obj;
-      bm.textContent = '¡Habéis superado el objetivo del mes en +' + fmt(excess) + '! 🎉';
-      bm.className   = 'bonus-msg exceeded-msg';
-    } else {
-      const msgs = unlocked ? MSGS_UNLOCKED : MSGS_LOCKED;
-      bm.textContent = msgs[Math.floor(Math.random() * msgs.length)];
-      bm.className   = 'bonus-msg ' + (unlocked ? 'unlocked-msg' : 'locked-msg');
-    }
-
-    const setB = (id, v) => {
-      const el = $(id);
-      if (v && v > 0) { el.textContent = fmt(v); el.className = 'bonus-row-val active'; }
-      else            { el.textContent = '—';    el.className = 'bonus-row-val zero';   }
-    };
-    setB('b-kris', bKris); setB('b-maria', bMaria);
-    setB('c-kris', cKris); setB('c-maria', cMaria);
-
-    if (bqKris  != null) $('bq-kris').textContent  = fmt(bqKris);
-    if (bqMaria != null) $('bq-maria').textContent = fmt(bqMaria);
-
-    applyBonusVisibility();
-
-    /* Card 4 — Vista Diaria */
-    const diasMes  = new Date(anoNum, mesIdx + 1, 0).getDate();
-    const diasRest = Math.max(diasMes - diaNum, 0);
-
-    /* rD only meaningful when objective not yet reached */
+    /* CARD 3 — Vista Diaria */
+    const diasRest   = Math.max(diasMes - diaNum, 0);
     const objReached = real != null && obj != null && real >= obj;
     const rD = objReached ? null
       : (ritmoD && ritmoD > 0 ? ritmoD
@@ -913,20 +730,17 @@ async function loadData() {
     $('hbv-kris').textContent     = fmt(hoyK);
     $('hbv-maria').textContent    = fmt(hoyM);
 
-    /* Total bar: granate when objective reached, black otherwise */
-    $('hbf-total').className = 'bar-fill ' + (objReached ? 'fill-obj-admin' : 'fill-obj');
-
-    /* Context message */
+    /* Mensaje */
     const ctx = $('hoy-context');
     if (objReached) {
       ctx.innerHTML = '🎉 <strong>¡Objetivo del mes alcanzado!</strong> Cada venta extra suma — recordad que lleváis comisión del <strong>2%</strong> sobre todo lo que vendáis a partir de ahora. ¡A por más!';
     } else if (rD != null && rD > 0) {
-      ctx.innerHTML = 'Necesitáis vender <strong>al menos ' + fmt(rD) + ' al día los próximos ' + diasRest + (diasRest === 1 ? ' día' : ' días') + ' para alcanzar el objetivo</strong> y desbloquear el bonus.';
+      ctx.innerHTML = 'Necesitáis vender <strong>al menos ' + fmt(rD) + ' al día los próximos ' + diasRest + (diasRest === 1 ? ' día' : ' días') + ' para el objetivo</strong>.';
     } else {
       ctx.innerHTML = '<strong>¡Seguid así!</strong> Cada venta cuenta para llegar al objetivo del mes.';
     }
 
-    animateHoyBars(hoyK || 0, hoyM || 0, hoyTotal || 0);
+    animateHoyBars(hoyK || 0, hoyM || 0, hoyTotal || 0, objReached);
 
     $('last-upd').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
 
@@ -943,23 +757,19 @@ $('refresh').onclick = loadData;
 /* Auto-refresh cada 5 minutos */
 setInterval(loadData, 5 * 60 * 1000);
 
-/* ── SESIÓN: cierre automático a los 5 minutos ── */
+/* SESIÓN: cierre automático a los 5 minutos de inactividad */
 let sessionTimer = null;
-
 function resetSessionTimer() {
   clearTimeout(sessionTimer);
   sessionTimer = setTimeout(() => {
-    /* Solo cerrar si el app está visible */
     if (document.getElementById('app').style.display !== 'none') {
       document.getElementById('app').style.display   = 'none';
       document.getElementById('login').style.display = 'flex';
       document.getElementById('pin').value = '';
       currentRole = 'admin';
     }
-  }, 5 * 60 * 1000); /* 5 minutos */
+  }, 5 * 60 * 1000);
 }
-
-/* Reiniciar el timer en cualquier interacción */
 ['click','keydown','touchstart'].forEach(evt =>
   document.addEventListener(evt, resetSessionTimer, { passive: true })
 );
