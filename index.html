@@ -371,7 +371,7 @@ html, body {
         </div>
 
         <div class="hoy-context" id="hoy-context">
-          🎉 <strong>¡Objetivo del mes alcanzado!</strong> Cada venta extra suma — recordad que lleváis comisión del <strong>2%</strong> sobre todo lo que vendáis a partir de ahora. ¡A por más!
+          Faltan <strong>3.000 €</strong> para el objetivo. Necesitáis vender <strong>al menos 376 € al día</strong> los próximos <strong>10 días</strong>.
         </div>
 
         <hr class="hoy-divider">
@@ -563,34 +563,35 @@ function updateDonut(pK, pM, noData) {
 function animateBars(obj, esp, real, diasMes, diaNum) {
   const overObj = real >= obj;
 
-  /* Reference scale: max of obj, real, forecast so all bars fit */
+  /* Scale: obj = 100% reference. Bars can exceed 100% visually if they surpass obj.
+     We cap display at 100% but forecast bar uses its own track so it CAN show > obj */
   const diasElapsed = Math.max(diaNum, 1);
   const forecast    = Math.round((real / diasElapsed) * diasMes);
-  const maxVal      = Math.max(obj, real, forecast, 1);
 
-  const pReal     = Math.min(Math.round((real     / maxVal) * 100), 100);
-  const pEsp      = Math.min(Math.round((esp      / maxVal) * 100), 100);
-  const pForecast = Math.min(Math.round((forecast / maxVal) * 100), 100);
-  /* Marker at obj position in the scale */
-  const pObjMark  = Math.min(Math.round((obj      / maxVal) * 100), 100);
+  /* All bars scaled relative to obj so proportions are correct */
+  const pReal     = obj > 0 ? Math.min(Math.round((real     / obj) * 100), 100) : 0;
+  const pEsp      = obj > 0 ? Math.min(Math.round((esp      / obj) * 100), 100) : 0;
+  /* Forecast can exceed 100% — we cap the fill at 100% width but show the number */
+  const pForecast = obj > 0 ? Math.min(Math.round((forecast / obj) * 100), 100) : 0;
 
-  /* % vs objective labels */
+  /* % labels — always vs objective */
   $('bp-real').textContent     = obj > 0 ? Math.round((real     / obj) * 100) + '%' : '—';
   $('bp-esp').textContent      = obj > 0 ? Math.round((esp      / obj) * 100) + '%' : '—';
   $('bp-forecast').textContent = obj > 0 ? Math.round((forecast / obj) * 100) + '%' : '—';
   $('bv-forecast').textContent = fmt(forecast);
 
-  /* Colors */
-  $('bf-real').className = 'bar-fill ' + (overObj ? 'fill-green' : 'fill-black');
+  /* Progreso bar: black → green when over obj */
+  $('bf-real').className   = 'bar-fill ' + (overObj ? 'fill-green' : 'fill-black');
   $('bv-real').style.color = overObj ? 'var(--green)' : 'var(--ink)';
   $('bp-real').style.color = overObj ? 'var(--green)' : 'var(--faint)';
 
-  const forecastOk = forecast >= obj;
-  $('bf-forecast').className = 'bar-fill ' + (forecastOk ? 'fill-green' : 'fill-forecast');
-  $('bv-forecast').style.color = forecastOk ? 'var(--green)' : 'var(--ink)';
-  $('bp-forecast').style.color = forecastOk ? 'var(--green)' : 'var(--faint)';
+  /* Forecast: always blue, no color change */
+  $('bf-forecast').className   = 'bar-fill fill-forecast';
+  $('bv-forecast').style.color = 'var(--ink)';
+  $('bp-forecast').style.color = 'var(--faint)';
 
-  /* Obj marker on progreso bar */
+  /* Obj marker on progreso bar when over obj */
+  const pObjMark = 100; /* obj is always 100% of itself */
   const marker = $('obj-marker');
   if (overObj) {
     marker.style.display = 'block';
@@ -730,14 +731,16 @@ async function loadData() {
     $('hbv-kris').textContent     = fmt(hoyK);
     $('hbv-maria').textContent    = fmt(hoyM);
 
-    /* Mensaje */
+    /* Mensaje card 3 — siempre informativo, nunca menciona bonus */
     const ctx = $('hoy-context');
-    if (objReached) {
-      ctx.innerHTML = '🎉 <strong>¡Objetivo del mes alcanzado!</strong> Cada venta extra suma — recordad que lleváis comisión del <strong>2%</strong> sobre todo lo que vendáis a partir de ahora. ¡A por más!';
+    if (diasRest <= 0) {
+      ctx.innerHTML = '¡Último día del mes! <strong>Todo lo que vendáis hoy suma al resultado final.</strong>';
+    } else if (objReached) {
+      ctx.innerHTML = '¡Objetivo del mes superado! <strong>Quedan ' + diasRest + ' días</strong> — cada venta extra cuenta para el resultado del mes.';
     } else if (rD != null && rD > 0) {
-      ctx.innerHTML = 'Necesitáis vender <strong>al menos ' + fmt(rD) + ' al día los próximos ' + diasRest + (diasRest === 1 ? ' día' : ' días') + ' para el objetivo</strong>.';
+      ctx.innerHTML = 'Faltan <strong>' + fmt(obj != null && real != null ? obj - real : null) + '</strong> para el objetivo. Necesitáis vender <strong>al menos ' + fmt(rD) + ' al día</strong> los próximos <strong>' + diasRest + (diasRest === 1 ? ' día' : ' días') + '</strong>.';
     } else {
-      ctx.innerHTML = '<strong>¡Seguid así!</strong> Cada venta cuenta para llegar al objetivo del mes.';
+      ctx.innerHTML = 'Quedan <strong>' + diasRest + (diasRest === 1 ? ' día' : ' días') + '</strong> para el final del mes. ¡A por el objetivo!';
     }
 
     animateHoyBars(hoyK || 0, hoyM || 0, hoyTotal || 0, objReached);
