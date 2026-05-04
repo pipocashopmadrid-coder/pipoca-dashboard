@@ -269,11 +269,21 @@ html, body {
       <div class="card-body">
 
         <div class="c1-kpi">
-          <div class="c1-real-label">Ventas reales</div>
-          <div class="c1-real-val" id="prog-real">22.400 €</div>
-          <div class="c1-obj-line">
-            <span class="c1-obj-label">Objetivo mensual</span>
-            <span class="c1-obj-val" id="prog-obj-val">21.000 €</span>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div class="c1-real-label">Ventas reales</div>
+              <div class="c1-real-val" id="prog-real">22.400 €</div>
+              <div class="c1-obj-line">
+                <span class="c1-obj-label">Objetivo mensual</span>
+                <span class="c1-obj-val" id="prog-obj-val">21.000 €</span>
+              </div>
+            </div>
+            <!-- Forecast — solo admin -->
+            <div id="forecast-block" style="text-align:right;display:none;">
+              <div class="c1-real-label">Previsión fin de mes</div>
+              <div id="bv-forecast" style="font-size:22px;font-weight:300;color:#5B8DB8;letter-spacing:-0.01em;line-height:1.1;">25.000 €</div>
+              <div id="bp-forecast" style="font-size:10px;color:#5B8DB8;margin-top:2px;">119% obj.</div>
+            </div>
           </div>
         </div>
 
@@ -292,8 +302,8 @@ html, body {
               <div class="bar-track h-lg">
                 <div class="bar-fill fill-green" id="bf-real" style="width:100%"></div>
               </div>
+              <!-- Solo la rayita, sin label -->
               <div class="obj-marker" id="obj-marker" style="left:94%">
-                <div class="obj-marker-label">objetivo</div>
                 <div class="obj-marker-inner"></div>
               </div>
             </div>
@@ -310,20 +320,6 @@ html, body {
             </div>
             <div class="bar-track h-md">
               <div class="bar-fill fill-esp" id="bf-esp" style="width:86%"></div>
-            </div>
-          </div>
-
-          <!-- Previsión a fin de mes (solo admin) -->
-          <div class="bar-row" id="bar-row-forecast">
-            <div class="bar-meta">
-              <span class="bar-name">Previsión a fin de mes</span>
-              <div class="bar-right">
-                <span class="bar-val" id="bv-forecast">25.000 €</span>
-                <span class="bar-pct" id="bp-forecast">119%</span>
-              </div>
-            </div>
-            <div class="bar-track h-md">
-              <div class="bar-fill fill-forecast" id="bf-forecast" style="width:95%"></div>
             </div>
           </div>
 
@@ -479,10 +475,10 @@ function tryLogin() {
 function applyVisibility() {
   const isAdmin = currentRole === 'admin';
   /* Card 1: esp y forecast solo para admin */
-  ['bar-row-esp','bar-row-forecast'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = isAdmin ? '' : 'none';
-  });
+  const espRow = document.getElementById('bar-row-esp');
+  if (espRow) espRow.style.display = isAdmin ? '' : 'none';
+  const fcBlock = document.getElementById('forecast-block');
+  if (fcBlock) fcBlock.style.display = isAdmin ? '' : 'none';
 }
 
 const $ = id => document.getElementById(id);
@@ -562,48 +558,38 @@ function updateDonut(pK, pM, noData) {
 /* ── BARS CARD 1 ── */
 function animateBars(obj, esp, real, diasMes, diaNum) {
   const overObj = real >= obj;
-
-  /* Scale: obj = 100% reference. Bars can exceed 100% visually if they surpass obj.
-     We cap display at 100% but forecast bar uses its own track so it CAN show > obj */
   const diasElapsed = Math.max(diaNum, 1);
   const forecast    = Math.round((real / diasElapsed) * diasMes);
 
-  /* All bars scaled relative to obj so proportions are correct */
-  const pReal     = obj > 0 ? Math.min(Math.round((real     / obj) * 100), 100) : 0;
-  const pEsp      = obj > 0 ? Math.min(Math.round((esp      / obj) * 100), 100) : 0;
-  /* Forecast can exceed 100% — we cap the fill at 100% width but show the number */
-  const pForecast = obj > 0 ? Math.min(Math.round((forecast / obj) * 100), 100) : 0;
+  /* All bars scaled relative to obj */
+  const pReal = obj > 0 ? Math.min(Math.round((real / obj) * 100), 100) : 0;
+  const pEsp  = obj > 0 ? Math.min(Math.round((esp  / obj) * 100), 100) : 0;
 
-  /* % labels — always vs objective */
-  $('bp-real').textContent     = obj > 0 ? Math.round((real     / obj) * 100) + '%' : '—';
-  $('bp-esp').textContent      = obj > 0 ? Math.round((esp      / obj) * 100) + '%' : '—';
-  $('bp-forecast').textContent = obj > 0 ? Math.round((forecast / obj) * 100) + '%' : '—';
+  /* % labels */
+  $('bp-real').textContent = obj > 0 ? Math.round((real / obj) * 100) + '%' : '—';
+  $('bp-esp').textContent  = obj > 0 ? Math.round((esp  / obj) * 100) + '%' : '—';
+
+  /* Inline forecast block */
   $('bv-forecast').textContent = fmt(forecast);
+  $('bp-forecast').textContent = obj > 0 ? Math.round((forecast / obj) * 100) + '% obj.' : '—';
 
   /* Progreso bar: black → green when over obj */
   $('bf-real').className   = 'bar-fill ' + (overObj ? 'fill-green' : 'fill-black');
   $('bv-real').style.color = overObj ? 'var(--green)' : 'var(--ink)';
   $('bp-real').style.color = overObj ? 'var(--green)' : 'var(--faint)';
 
-  /* Forecast: always blue, no color change */
-  $('bf-forecast').className   = 'bar-fill fill-forecast';
-  $('bv-forecast').style.color = 'var(--ink)';
-  $('bp-forecast').style.color = 'var(--faint)';
-
-  /* Obj marker on progreso bar when over obj */
-  const pObjMark = 100; /* obj is always 100% of itself */
+  /* Obj marker on progreso bar — only the line, no label */
   const marker = $('obj-marker');
   if (overObj) {
     marker.style.display = 'block';
-    marker.style.left    = pObjMark + '%';
+    marker.style.left    = '100%';
   } else {
     marker.style.display = 'none';
   }
 
   setTimeout(() => {
-    $('bf-real').style.width     = pReal     + '%';
-    $('bf-esp').style.width      = pEsp      + '%';
-    $('bf-forecast').style.width = pForecast + '%';
+    $('bf-real').style.width = pReal + '%';
+    $('bf-esp').style.width  = pEsp  + '%';
   }, 350);
 }
 
