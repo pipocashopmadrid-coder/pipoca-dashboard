@@ -648,9 +648,9 @@ async function loadData() {
   try {
     const t = await fetchSheet('Dashboard', 'B3:I32');
 
-    /* FECHA */
-    const rawDate = val(t, 0, 1);
-    const fmtDate = fval(t, 0, 1);
+    /* FECHA — B3 tiene =HOY() (col 0), no C3 */
+    const rawDate = val(t, 0, 0);
+    const fmtDate = fval(t, 0, 0);
     let diaNum, mesIdx, anoNum;
     const s1 = rawDate ? String(rawDate).match(/Date\((\d+),(\d+),(\d+)/) : null;
     if (s1) {
@@ -661,9 +661,10 @@ async function loadData() {
       if (s2) {
         diaNum = +s2[1]; mesIdx = +s2[2] - 1; anoNum = +s2[3];
       } else {
-        const d3 = val(t,0,2), e3 = val(t,0,3), f3 = val(t,0,4);
-        if (d3 != null && e3 != null) {
-          diaNum = Math.round(+d3); mesIdx = Math.round(+e3) - 1; anoNum = +(f3 || new Date().getFullYear());
+        /* Fallback: C3=día, D3=mes, E3=año */
+        const c3 = val(t,0,1), d3 = val(t,0,2), e3 = val(t,0,3);
+        if (c3 != null && d3 != null && +d3 <= 12) {
+          diaNum = Math.round(+c3); mesIdx = Math.round(+d3) - 1; anoNum = +(e3 || new Date().getFullYear());
         } else {
           const now = new Date();
           diaNum = now.getDate(); mesIdx = now.getMonth(); anoNum = now.getFullYear();
@@ -671,19 +672,24 @@ async function loadData() {
       }
     }
     if (mesIdx < 0 || mesIdx > 11 || isNaN(mesIdx)) mesIdx = new Date().getMonth();
+    if (!diaNum || isNaN(diaNum)) diaNum = new Date().getDate();
 
-    /* DATOS */
-    const obj    = val(t,  2, 1); // C5
-    const esp    = val(t,  3, 1); // C6
-    const real   = val(t,  4, 1); // C7
-    const vKris  = val(t,  5, 1); // C10
-    const pKris  = val(t,  6, 1); // C11
-    const vMaria = val(t,  7, 1); // C12
-    const pMaria = val(t,  8, 1); // C13
-    const ritmoD = val(t, 15, 1); // C22
-    const hoyTot = val(t, 16, 1); // C23
-    const hoyK   = val(t, 17, 1); // C24
-    const hoyM   = val(t, 18, 1); // C25
+    /* DATOS MENSUAL */
+    const obj    = val(t, 2, 1); // C5
+    const esp    = val(t, 3, 1); // C6
+    const real   = val(t, 4, 1); // C7
+
+    /* EMPLEADAS (filas 10-13, gviz 5-8 saltando filas 8-9 vacías) */
+    const vKris  = val(t, 5, 1); // C10
+    const pKris  = val(t, 6, 1); // C11
+    const vMaria = val(t, 7, 1); // C12
+    const pMaria = val(t, 8, 1); // C13
+
+    /* DIARIO — gviz row 9=header DIARIO, 10=mínimas, 11=hoy total, 12=Kris, 13=Pilar */
+    const ritmoD = val(t, 10, 1); // C23
+    const hoyTot = val(t, 11, 1); // C24
+    const hoyK   = val(t, 12, 1); // C25
+    const hoyM   = val(t, 13, 1); // C26
 
     /* NOMBRES */
     const nameE1  = (val(t, 1, 7) || 'Empleada 1').trim();
