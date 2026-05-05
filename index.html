@@ -559,10 +559,9 @@ function updateDonut(pK, pM, noData) {
 }
 
 /* ── BARS CARD 1 ── */
-function animateBars(obj, esp, real, diasMes, diaNum) {
+function animateBars(obj, esp, real, diasMes, diaNum, horaES) {
   const overObj = real >= obj;
   /* Forecast: si son antes de las 11h (hora española), hoy no cuenta como día de ventas */
-  const horaES = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' })).getHours();
   const diasConVentas = horaES >= 11 ? diaNum : Math.max(diaNum - 1, 1);
   const forecast = diasConVentas > 0 ? Math.round((real / diasConVentas) * diasMes) : null;
 
@@ -688,11 +687,12 @@ async function loadData() {
 
     /* CARD 1 */
     const diasMes  = new Date(anoNum, mesIdx + 1, 0).getDate();
+    const horaES   = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' })).getHours();
     $('prog-real').textContent    = fmt(real);
     $('prog-obj-val').textContent = fmt(obj);
     $('bv-esp').textContent       = fmt(esp);
     $('bv-real').textContent      = fmt(real);
-    animateBars(obj || 1, esp || 0, real || 0, diasMes, diaNum);
+    animateBars(obj || 1, esp || 0, real || 0, diasMes, diaNum, horaES);
 
     /* CARD 2 */
     const pK = Math.round((pKris  || 0) * 100);
@@ -706,7 +706,12 @@ async function loadData() {
     $('leg-maria-val').textContent = fmt(vMaria);
 
     /* CARD 3 — Vista Diaria */
-    const diasRest   = Math.max(diasMes - diaNum, 0);
+    /* diasRest: si antes de las 11h, hoy cuenta como día disponible (tienda no ha abierto aún)
+       si a partir de las 11h, hoy ya está en marcha y no suma como día futuro completo */
+    const diasRest = horaES >= 11
+      ? Math.max(diasMes - diaNum, 0)        /* hoy ya abierto: quedan los días tras hoy */
+      : Math.max(diasMes - diaNum + 1, 0);   /* hoy aún no abierto: hoy también cuenta */
+
     const objReached = real != null && obj != null && real >= obj;
     const rD = objReached ? null
       : (ritmoD && ritmoD > 0 ? ritmoD
