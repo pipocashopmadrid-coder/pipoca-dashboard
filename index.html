@@ -651,31 +651,11 @@ async function loadData() {
   try {
     const t = await fetchSheet('Dashboard', 'B3:I32');
 
-    /* FECHA — B3 tiene =HOY() (col 0), no C3 */
-    const rawDate = val(t, 0, 0);
-    const fmtDate = fval(t, 0, 0);
-    let diaNum, mesIdx, anoNum;
-    const s1 = rawDate ? String(rawDate).match(/Date\((\d+),(\d+),(\d+)/) : null;
-    if (s1) {
-      anoNum = +s1[1]; mesIdx = +s1[2]; diaNum = +s1[3];
-    } else {
-      const dateStr = fmtDate || (rawDate ? String(rawDate) : '');
-      const s2 = dateStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
-      if (s2) {
-        diaNum = +s2[1]; mesIdx = +s2[2] - 1; anoNum = +s2[3];
-      } else {
-        /* Fallback: C3=día, D3=mes, E3=año */
-        const c3 = val(t,0,1), d3 = val(t,0,2), e3 = val(t,0,3);
-        if (c3 != null && d3 != null && +d3 <= 12) {
-          diaNum = Math.round(+c3); mesIdx = Math.round(+d3) - 1; anoNum = +(e3 || new Date().getFullYear());
-        } else {
-          const now = new Date();
-          diaNum = now.getDate(); mesIdx = now.getMonth(); anoNum = now.getFullYear();
-        }
-      }
-    }
-    if (mesIdx < 0 || mesIdx > 11 || isNaN(mesIdx)) mesIdx = new Date().getMonth();
-    if (!diaNum || isNaN(diaNum)) diaNum = new Date().getDate();
+    /* FECHA — siempre desde el navegador, no del Sheet */
+    const now    = new Date();
+    const diaNum = now.getDate();
+    const mesIdx = now.getMonth();      /* 0-indexado, perfecto para MESES[] */
+    const anoNum = now.getFullYear();
 
     /* DATOS MENSUAL */
     const obj    = val(t, 2, 1); // C5
