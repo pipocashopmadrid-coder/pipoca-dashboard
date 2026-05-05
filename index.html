@@ -561,8 +561,10 @@ function updateDonut(pK, pM, noData) {
 /* ── BARS CARD 1 ── */
 function animateBars(obj, esp, real, diasMes, diaNum) {
   const overObj = real >= obj;
-  const diasElapsed = Math.max(diaNum, 1);
-  const forecast    = Math.round((real / diasElapsed) * diasMes);
+  /* Forecast: si son antes de las 11h (hora española), hoy no cuenta como día de ventas */
+  const horaES = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Madrid' })).getHours();
+  const diasConVentas = horaES >= 11 ? diaNum : Math.max(diaNum - 1, 1);
+  const forecast = diasConVentas > 0 ? Math.round((real / diasConVentas) * diasMes) : null;
 
   let pReal, pEsp, pObjMark;
 
